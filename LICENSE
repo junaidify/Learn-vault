@@ -1,21 +1,156 @@
-MIT License
+<!-- ============== BANNER ============== -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,20,24&height=220&section=header&text=Junaid%20Khan&fontSize=70&fontColor=ffffff&fontAlignY=35&desc=Java%20Full-Stack%20Developer%20%7C%20Spring%20Boot%20%2B%20React&descAlignY=58&descSize=18&animation=fadeIn" />
+</p>
+<!-- ============== TYPING HEADLINE ============== -->
+<p align="center">
+  <a href="https://github.com/junaidify">
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=2800&pause=900&color=6DB33F&center=true&vCenter=true&width=720&lines=Building+full-stack+apps+with+Spring+Boot+%2B+React;200%2B+DSA+problems+solved+on+LeetCode;Shipping+clean%2C+production-ready+systems;Open+to+SDE+%2F+Backend+%2F+Full-Stack+roles" />
+  </a>
+</p>
+<!-- ============== SOCIAL BADGES ============== -->
+<p align="center">
+  <a href="https://www.linkedin.com/in/junaidify-khan">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
+  </a>
+  <a href="https://leetcode.com/u/junaidify/">
+    <img src="https://img.shields.io/badge/LeetCode-200%2B%20Solved-FFA116?style=for-the-badge&logo=leetcode&logoColor=white" />
+  </a>
+  <a href="mailto:junaidkhan23785@gmail.com">
+    <img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" />
+  </a>
+  <a href="https://github.com/junaidify">
+    <img src="https://img.shields.io/github/followers/junaidify?label=Follow&style=for-the-badge&color=6DB33F&logo=github" />
+  </a>
+</p>
+<br/>
+<!-- ============== ABOUT ============== -->
+<img src="https://media.giphy.com/media/hvRJCLFzcasrR4ia7z/giphy.gif" width="28">  About Me
+yamlname:        Junaid Khan
+role:        Java Full-Stack Developer
+location:    New Delhi, India
+focus:       Spring Boot · JPA · Hibernate · React
+strengths:   [DSA, REST APIs, Full-Stack Architecture]
+currently:   Building production Spring Boot project
+open_to:     SDE / Backend / Full-Stack roles
+contact:     junaidkhan23785@gmail.com
+<br/>
+<!-- ============== FEATURED PROJECTS ============== -->
+<img src="https://media.giphy.com/media/iY8CRBdQXODJSCERIr/giphy.gif" width="28">  Featured Projects
+<table>
+<tr>
+<td width="50%" valign="top">
+🟢 ResumeForge
+Live · Deployed
+Full-stack resume builder with skill-based hiring evaluation engine.
+TypeScript React Node.js Express MongoDB
 
-Copyright (c) 2026 Junaid Khan
+{{ Add 1 line of impact: e.g. "X resumes generated" or "JWT auth + distributed evaluation pipeline" }}
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Show Image
+</td>
+<td width="50%" valign="top">
+🔨 {{ Spring Boot Project Name }}
+Building · Ships {{ Month, Year }}
+{{ 1-line description: what it does + who it's for }}
+Java 17 Spring Boot JPA Hibernate PostgreSQL React
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Currently architecting REST APIs, JPA entities, and JWT-based auth flow.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+[Show Image](https://github.com/junaidify/{{ repo }})
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+🐍 promptkit
+Open Source
+Lightweight Python toolkit for cleaning and preparing text for LLMs.
+Python
+Show Image
+</td>
+<td width="50%" valign="top">
+🛒 Pantaloons Clone
+Frontend Showcase
+E-commerce clone replicating Pantaloons retail experience.
+React Redux JavaScript
+Show Image
+</td>
+</tr>
+</table>
+<br/>
+<!-- ============== TECH STACK ============== -->
+<img src="https://media.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif" width="28">  Tech Stack
+<table>
+<tr>
+<td valign="top" width="120"><b>Backend</b></td>
+<td>
+<img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" />
+<img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" />
+<img src="https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white" />
+<img src="https://img.shields.io/badge/JPA-007396?style=for-the-badge&logo=java&logoColor=white" />
+<img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td valign="top"><b>Frontend</b></td>
+<td>
+<img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
+<img src="https://img.shields.io/badge/Redux-764ABC?style=for-the-badge&logo=redux&logoColor=white" />
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
+<img src="https://img.shields.io/badge/Tailwind-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td valign="top"><b>Databases</b></td>
+<td>
+<img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+</td>
+</tr>
+<tr>
+<td valign="top"><b>Tools</b></td>
+<td>
+<img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" />
+<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+<img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white" />
+<img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" />
+</td>
+</tr>
+</table>
+<br/>
+<!-- ============== GITHUB STATS ============== -->
+<img src="https://media.giphy.com/media/SWoSkN6DxTszqIKEqv/giphy.gif" width="28">  GitHub Stats
+<p align="center">
+  <img height="170" src="https://github-readme-stats.vercel.app/api?username=junaidify&show_icons=true&theme=github_dark&hide_border=true&count_private=true&include_all_commits=true&rank_icon=github&bg_color=0d1117&title_color=6DB33F&icon_color=6DB33F" />
+  <img height="170" src="https://streak-stats.demolab.com?user=junaidify&theme=github-dark&hide_border=true&background=0d1117&ring=6DB33F&fire=6DB33F&currStreakLabel=6DB33F" />
+</p>
+<p align="center">
+  <img height="170" src="https://github-readme-stats.vercel.app/api/top-langs/?username=junaidify&layout=compact&theme=github_dark&hide_border=true&langs_count=8&bg_color=0d1117&title_color=6DB33F" />
+</p>
+<p align="center">
+  <img src="https://github-profile-trophy.vercel.app/?username=junaidify&theme=darkhub&no-frame=true&no-bg=true&margin-w=4&row=1&column=7" />
+</p>
+<br/>
+<!-- ============== LEETCODE ============== -->
+<img src="https://media.giphy.com/media/W5fMHgsbnhRTU5CdLz/giphy.gif" width="28">  LeetCode
+<p align="center">
+  <img src="https://leetcard.jacoblin.cool/junaidify?theme=dark&font=Source%20Code%20Pro&ext=heatmap" />
+</p>
+<br/>
+<!-- ============== CONTRIBUTION GRAPH ============== -->
+<img src="https://media.giphy.com/media/L8K62iTDkzGX6/giphy.gif" width="28">  Contribution Activity
+<p align="center">
+  <img src="https://github-readme-activity-graph.vercel.app/graph?username=junaidify&theme=github-compact&hide_border=true&bg_color=0d1117&color=6DB33F&line=6DB33F&point=ffffff&area=true&area_color=6DB33F" />
+</p>
+<br/>
+<!-- ============== FOOTER ============== -->
+<p align="center">
+  <a href="mailto:junaidkhan23785@gmail.com">
+    <img src="https://img.shields.io/badge/Let's_Connect-6DB33F?style=for-the-badge&logo=gmail&logoColor=white" />
+  </a>
+</p>
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,20,24&height=100&section=footer" />
+</p>
