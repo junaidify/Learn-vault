@@ -17,20 +17,20 @@ public class CourseEntity {
     private String title;
 
     @NotEmpty(message = "Please add author name")
-    private String authorId;
+    private Long authorId;
 
     protected CourseEntity(){};
 
-    public CourseEntity(String title, String authorId){
+    public CourseEntity(String title, Long authorId){
         this.title = title;
         this.authorId = authorId;
     }
 
     public Long getId(){ return id; }
     public String getTitle(){ return title; }
-    public String getAuthorId(){ return authorId; }
+    public Long getAuthorId(){ return authorId; }
 
     public void setTitle(String title){ this.title = title; }
-    public void setAuthorId(String authorId){ this.authorId = authorId; }
+    public void setAuthorId(Long authorId){ this.authorId = authorId; }
 
 }
