@@ -39,7 +39,7 @@ public class UserEntity {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.role = Role.Student;
+        this.role = Role.STUDENT;
     }
 
     public Long getId(){ return id; }
@@ -47,7 +47,7 @@ public class UserEntity {
     public String getUsername(){ return username; }
     public String getEmail(){ return email; }
     public String getPassword(){ return password; }
-    public Role getRoles(){return role; }
+    public Role getRole(){return role; }
 
     public void setName(String name){ this.name = name; }
     public void setUsername(String username){ this.username = username; }

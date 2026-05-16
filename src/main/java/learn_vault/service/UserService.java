@@ -1,17 +1,24 @@
 package learn_vault.service;
 
-import learn_vault.dto.UserRegisterDto;
+import learn_vault.dto.SignupDto;
 import learn_vault.entities.UserEntity;
 import learn_vault.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import learn_vault.utils.JwtUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
+    public final UserRepository userRepository;
+    public final PasswordEncoder passwordEncoder;
+    public final JwtUtils jwtUtils;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils){
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
+    }
 
-    public String userRegister(UserRegisterDto dto){
+    public String userSignUp(SignupDto dto){
         if(userRepository.existsByEmail(dto.getEmail())){
             return "Email already exists";
         }
@@ -20,17 +27,18 @@ public class UserService {
             return "Username already taken.";
         }
 
+        String hashPassword = passwordEncoder.encode(dto.getPassword());
+
         UserEntity newUser = new UserEntity(
                 dto.getName(),
                 dto.getUsername(),
                 dto.getEmail(),
-                dto.getPassword()
+                hashPassword
         );
 
         userRepository.save(newUser);
-        return "User registered successfully.";
+        return jwtUtils.jwtGeneration(newUser.getEmail());
+
 
     }
-
-
 }
