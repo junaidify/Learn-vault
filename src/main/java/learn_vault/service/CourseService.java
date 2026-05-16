@@ -21,13 +21,7 @@ public class CourseService {
     public String courseCreate(CourseDto dto) {
         Optional<AuthorEntity> authorOpt = authorRepository.findByAuthorName(dto.getAuthorName());
 
-        AuthorEntity author;
-
-        if(authorOpt.isEmpty()){
-            author = authorRepository.save(new AuthorEntity(dto.getAuthorName()));
-        }else{
-            author = authorOpt.get();
-        }
+        AuthorEntity author = authorOpt.orElseGet(() -> authorRepository.save( new AuthorEntity(dto.getAuthorName())));
 
         List<CourseEntity> courseExistsList = courseRepository.findByAuthorId(author.getAuthorId());
 
