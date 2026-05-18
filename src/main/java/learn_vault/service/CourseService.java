@@ -1,5 +1,6 @@
 package learn_vault.service;
 
+import learn_vault.controller.CourseController;
 import learn_vault.dto.CourseDto;
 import learn_vault.entities.AuthorEntity;
 import learn_vault.entities.CourseEntity;
@@ -13,10 +14,13 @@ import java.util.Optional;
 
 @Service
 public class CourseService {
-    @Autowired
-    private CourseRepository courseRepository;
-    @Autowired
-    private AuthorRepository authorRepository;
+   private final CourseRepository courseRepository;
+   private final AuthorRepository authorRepository;
+
+   public CourseService(CourseRepository courseRepository, AuthorRepository authorRepository){
+       this.authorRepository = authorRepository;
+       this.courseRepository = courseRepository;
+   }
 
     public String courseCreate(CourseDto dto) {
         Optional<AuthorEntity> authorOpt = authorRepository.findByAuthorName(dto.getAuthorName());
@@ -32,5 +36,15 @@ public class CourseService {
 
         courseRepository.save(new CourseEntity(dto.getTitle(), author.getAuthorId()));
         return "Course created successfully.";
+    }
+
+    public List<CourseEntity> getCourses() {
+        List<CourseEntity> courses = courseRepository.findAll();
+
+        return courses.isEmpty() ? Collections.emptyList() : courses;
+    }
+
+    public Optional<CourseEntity> getCourse(Long id){
+       return courseRepository.findById(id);
     }
 }
