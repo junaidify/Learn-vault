@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+// Spring has no clue what database are we using/what method, spring security and database are two seperate worlds,
+// to connect both of them and have the context(in which format we are dealing)
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

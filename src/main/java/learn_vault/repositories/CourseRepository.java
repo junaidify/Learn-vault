@@ -10,6 +10,6 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
     boolean existsByAuthorId(Long authorId);
     boolean existsByTitle(String title);
     List<CourseEntity> findByAuthorId(Long authorId);
-    List<CourseEntity> finAll();
+    List<CourseEntity> findAll();
     Optional<CourseEntity> findById(Long id);
 }

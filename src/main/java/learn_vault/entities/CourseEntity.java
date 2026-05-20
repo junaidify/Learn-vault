@@ -3,6 +3,7 @@ package learn_vault.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name="courses",
@@ -16,7 +17,7 @@ public class CourseEntity {
     @NotBlank(message = "Add title of course")
     private String title;
 
-    @NotEmpty(message = "Please add author name")
+    @NotNull(message = "Please add author name")
     private Long authorId;
 
     protected CourseEntity(){};
