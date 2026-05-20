@@ -33,13 +33,17 @@ public class JwtFilters extends OncePerRequestFilter {
 
        Cookie[] cookies = request.getCookies();
 
+       if(cookies == null){
+           filterChain.doFilter(request, response);
+       }
+
        for(Cookie cookie : cookies){
            if(cookie.getName().equals("jwt")){
                token = cookie.getValue();
            }
        }
 
-       if(token != null){
+       if(token == null){
            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
            return;
        }
@@ -57,12 +61,16 @@ public class JwtFilters extends OncePerRequestFilter {
            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
            return;
        }
-       catch(JwtException e){
+       catch(JwtException e) {
            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
            return;
        }
 
-
        filterChain.doFilter(request, response);
+    }
+
+    @Override
+    public boolean shouldNotFilter(HttpServletRequest request){
+        return request.getServletPath().startsWith("/auth/**");
     }
 }
