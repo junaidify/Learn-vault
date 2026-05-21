@@ -9,13 +9,7 @@ import lombok.Data;
 
 @Data
 public class LoginDto {
-    @NotBlank(message = "Enter email")
-    @Email
     private String email;
-
-    @NotBlank(message = "Enter valid username")
-    @Size(min = 8, max = 15, message = "Password must be between 8-15 characters.")
-    @Pattern(regexp = "^[a-zA-Z0-9_]*$", message = "Username can contain letters, numbers and underscore.")
     private String username;
 
     @NotBlank(message = "Enter password")

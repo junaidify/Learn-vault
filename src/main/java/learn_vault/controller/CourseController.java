@@ -20,7 +20,7 @@ public class CourseController {
     }
 
     @PostMapping("/create-course")
-    public String createCourse(@Valid @RequestBody CourseDto dto){
+    public String courseCreate(@Valid @RequestBody CourseDto dto){
         return courseService.courseCreate(dto);
     }
 

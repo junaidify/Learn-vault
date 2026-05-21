@@ -1,9 +1,7 @@
 package learn_vault.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+import learn_vault.enums.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,5 +25,8 @@ public class SignupDto {
     @Size(min=8, max=20, message = "Password must be between 8-20 characters.")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).*$", message = "Password must contain at least one digit, one lowercase and one uppercase letter.")
     private String password;
+
+    @NotNull(message = "Role should define")
+    private Role role;
 
 }
