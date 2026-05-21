@@ -23,12 +23,8 @@ public class UserService {
     }
 
     public String userSignUp(SignupDto dto){
-        if(userRepository.existsByEmail(dto.getEmail())){
-            return "Email already exists";
-        }
-
-        if(userRepository.existsByUsername(dto.getUsername())){
-            return "Username already taken.";
+        if(userRepository.existsByUsernameOrPassword(dto.getUsername(), dto.getEmail())){
+            throw new RuntimeException("User already exist");
         }
 
         String hashPassword = passwordEncoder.encode(dto.getPassword());
@@ -37,7 +33,8 @@ public class UserService {
                 dto.getName(),
                 dto.getUsername(),
                 dto.getEmail(),
-                hashPassword
+                hashPassword,
+                dto.getRole()
         );
 
         userRepository.save(newUser);
@@ -45,11 +42,14 @@ public class UserService {
     }
 
     public String userLogin(LoginDto dto){
+        if(dto.getEmail() == null && dto.getUsername() == null){
+            throw new RuntimeException("Provide username or email");
+        }
         Optional<UserEntity> isExistUser = userRepository.findByUsernameOrEmail(dto.getUsername(), dto.getEmail());
 
         if(isExistUser.isEmpty()){
-            return "User not found";
-        }
+            throw new RuntimeException("User not found");
+        };
 
         UserEntity user = isExistUser.get();
 

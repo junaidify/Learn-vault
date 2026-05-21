@@ -3,7 +3,7 @@ package learn_vault.utils;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
@@ -14,7 +14,7 @@ import java.security.Key;
 public class JwtUtils {
     private final Key SECRET_KEY;
 
-    public JwtUtils(@Value("${jwt.key}") String secret){
+    public JwtUtils(@Value("${jwt.secret}") String secret){
         this.SECRET_KEY = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));
     }
     public String jwtGeneration(String email) {
@@ -30,7 +30,7 @@ public class JwtUtils {
         return Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }

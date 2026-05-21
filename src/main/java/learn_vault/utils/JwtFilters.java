@@ -30,11 +30,11 @@ public class JwtFilters extends OncePerRequestFilter {
     protected  void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
     throws ServletException, IOException {
        String token = null;
-
        Cookie[] cookies = request.getCookies();
 
        if(cookies == null){
            filterChain.doFilter(request, response);
+           return;
        }
 
        for(Cookie cookie : cookies){
@@ -50,18 +50,15 @@ public class JwtFilters extends OncePerRequestFilter {
 
        try{
            String email = jwtUtils.extractEmail(token);
-           UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
-           UsernamePasswordAuthenticationToken authToken =
-                   new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-           SecurityContextHolder.getContext().setAuthentication(authToken);
+           if(email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+               UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+               UsernamePasswordAuthenticationToken authToken =
+                       new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-
-       }catch(ExpiredJwtException e){
-           response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-           return;
-       }
-       catch(JwtException e) {
+               SecurityContextHolder.getContext().setAuthentication(authToken);
+           }
+       }catch(JwtException e) {
            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
            return;
        }
@@ -71,6 +68,6 @@ public class JwtFilters extends OncePerRequestFilter {
 
     @Override
     public boolean shouldNotFilter(HttpServletRequest request){
-        return request.getServletPath().startsWith("/auth/**");
+        return request.getServletPath().startsWith("/auth/");
     }
 }
