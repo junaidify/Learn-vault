@@ -5,6 +5,7 @@ import learn_vault.dto.CourseDto;
 import learn_vault.entities.CourseEntity;
 import learn_vault.service.CourseService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class CourseController {
     }
 
     @PostMapping("/create-course")
+    @PreAuthorize("hasRole('AUTHOR')")
     public String courseCreate(@Valid @RequestBody CourseDto dto){
         return courseService.courseCreate(dto);
     }

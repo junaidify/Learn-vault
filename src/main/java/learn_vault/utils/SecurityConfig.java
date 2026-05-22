@@ -28,10 +28,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.
                         sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**")
-                        .permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/author/**").hasRole("AUTHOR")
+                        .requestMatchers("/course/create-course").hasRole("AUTHOR")
                         .requestMatchers("/course/**").hasRole("STUDENT")
                         .anyRequest()
                         .authenticated())

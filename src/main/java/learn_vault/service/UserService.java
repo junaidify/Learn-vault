@@ -23,7 +23,7 @@ public class UserService {
     }
 
     public String userSignUp(SignupDto dto){
-        if(userRepository.existsByUsernameOrPassword(dto.getUsername(), dto.getEmail())){
+        if(userRepository.existsByUsernameOrEmail(dto.getUsername(), dto.getEmail())){
             throw new RuntimeException("User already exist");
         }
 

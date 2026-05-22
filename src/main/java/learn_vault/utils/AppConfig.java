@@ -3,6 +3,8 @@ package learn_vault.utils;
 import learn_vault.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -34,5 +36,13 @@ public class AppConfig {
         provider.setPasswordEncoder(passwordEncoder());
 
         return provider;
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy(){
+        return RoleHierarchyImpl.withDefaultRolePrefix()
+                .role("ADMIN").implies("AUTHOR")
+                .role("AUTHOR").implies("STUDENT")
+                .build();
     }
 }

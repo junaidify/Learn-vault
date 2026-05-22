@@ -1,12 +1,10 @@
 package learn_vault.service;
 
-import learn_vault.controller.CourseController;
 import learn_vault.dto.CourseDto;
 import learn_vault.entities.AuthorEntity;
 import learn_vault.entities.CourseEntity;
 import learn_vault.repositories.AuthorRepository;
 import learn_vault.repositories.CourseRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,14 +25,14 @@ public class CourseService {
 
         AuthorEntity author = authorOpt.orElseGet(() -> authorRepository.save( new AuthorEntity(dto.getAuthorName())));
 
-        List<CourseEntity> courseExistsList = courseRepository.findByAuthorId(author.getAuthorId());
+        List<CourseEntity> courseExistsList = courseRepository.findByAuthor_AuthorId(author.getAuthorId());
 
         boolean isCourseExist = courseExistsList.stream().
                 anyMatch(course -> course.getTitle().equals(dto.getTitle()));
 
         if(isCourseExist) return "Course already exist";
 
-        courseRepository.save(new CourseEntity(dto.getTitle(), author.getAuthorId()));
+        courseRepository.save(new CourseEntity(dto.getTitle(), author));
         return "Course created successfully.";
     }
 
