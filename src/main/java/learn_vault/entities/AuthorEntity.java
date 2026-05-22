@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Table(name="author")
 @Data
@@ -14,6 +16,13 @@ public class AuthorEntity {
 
     @NotBlank(message = "Author name can't be empty.")
     private String authorName;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
+    @OneToMany(mappedBy = "author")
+    private List<CourseEntity> courses;
 
     protected AuthorEntity(){};
 

@@ -5,7 +5,11 @@
       "Bash(Select-Object FullName)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Junaid Khan\\\\codestra\\\\source_code\\\\Learn-vault\" -Recurse -Force)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(Sort-Object)"
+      "Bash(Sort-Object)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Junaid Khan\\\\codestra\\\\source_code\\\\Learn-vault\" -Recurse)",
+      "Bash(Select-Object -Property FullName)",
+      "Bash(Sort-Object FullName)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Junaid Khan\\\\codestra\\\\source_code\\\\Learn-vault\" -Recurse -File | Select-Object -Property FullName | Sort-Object FullName | ForEach-Object { $_.FullName })"
     ]
   }
 }
