@@ -2,13 +2,17 @@ package learn_vault.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
 @Entity
-@Table(name="author")
-@Data
+@Table(name = "author")
+@Getter
+@Setter
+@ToString(exclude = {"courses", "user"})
 public class AuthorEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,13 +25,17 @@ public class AuthorEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
     private List<CourseEntity> courses;
 
-    protected AuthorEntity(){};
+    protected AuthorEntity() {}
 
-    public AuthorEntity(String authorName){
+    public AuthorEntity(String authorName) {
         this.authorName = authorName;
     }
 
+    public AuthorEntity(String authorName, UserEntity user) {
+        this.authorName = authorName;
+        this.user = user;
+    }
 }

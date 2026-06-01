@@ -16,23 +16,35 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
     private final UserService userService;
 
-    public LoginController(UserService userService){
+    public LoginController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginDto dto){
+    public ResponseEntity<String> login(@Valid @RequestBody LoginDto dto) {
         String token = userService.userLogin(dto);
 
-        ResponseCookie cookies = ResponseCookie.from("jwt", token)
+        ResponseCookie cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
                 .path("/")
-                .maxAge( 60 * 60 * 48)
+                .maxAge(60 * 60 * 48)
                 .build();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookies.toString())
-                .body("User login successfully");
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body("Login successful");
+    }
 
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout() {
+        ResponseCookie expiredCookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
+                .body("Logged out successfully");
     }
 }
