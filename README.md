@@ -8,15 +8,15 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Database Schema](#database-schema)
+- [Roles & Permissions](#roles--permissions)
 - [API Reference](#api-reference)
-- [Security Model](#security-model)
+- [Database Schema](#database-schema)
 - [Getting Started](#getting-started)
 - [Environment Configuration](#environment-configuration)
+- [Running Tests](#running-tests)
+- [Production Checklist](#production-checklist)
 - [Roadmap](#roadmap)
 
 ---
@@ -25,188 +25,217 @@
 
 LearnVault solves one of the most frustrating problems in tech education: **there is no single, structured, community-vetted path to learn a given tech stack**. Developers waste weeks bouncing between YouTube tutorials, Reddit threads, and random blog posts, never sure if they're learning things in the right order.
 
-LearnVault fixes this by letting the developer community build and maintain **opinionated, ordered learning curriculums** — think of it as a Wikipedia for tech roadmaps, where courses are organized by authors and students follow a clear progression.
-
----
-
-## Features
-
-### Currently Implemented
-
-| Feature | Status |
-|---|---|
-| User Registration with validation | Done |
-| BCrypt password hashing | Done |
-| JWT generation & HTTP-only cookie auth | Done |
-| Role-based user model (STUDENT / INSTRUCTOR / ADMIN) | Done |
-| Course creation with author management | Done |
-| Course listing and retrieval by ID | Done |
-| PostgreSQL persistence via Spring Data JPA | Done |
-| Google OAuth2 client setup | In Progress |
-
-### Planned Features
-
-| Feature | Description |
-|---|---|
-| **JWT Authentication Filter** | Secure endpoints with stateless JWT validation on every request |
-| **Login Endpoint** | Email/password login returning JWT cookie |
-| **Role-Based Access Control** | Restrict course creation to INSTRUCTOR/ADMIN roles |
-| **Razorpay Payment Integration** | Students pay to enroll in premium courses |
-| **RAG-Based AI Assistant** | OpenAI-powered Q&A assistant with pgvector for semantic course search |
-| **Course Enrollment** | Track student-course relationships |
-| **Google OAuth2 Login** | Sign in with Google as an alternative auth method |
-| **Pagination** | Paginated course listing endpoints |
-| **Course Update & Delete** | Full CRUD for course management |
+LearnVault lets the developer community build and maintain **opinionated, ordered learning curriculums** — think Wikipedia for tech roadmaps, where courses are organized by authors and students follow a clear progression.
 
 ---
 
 ## Tech Stack
 
-### Backend
 | Layer | Technology |
-|---|---|
+|-------|-----------|
 | Language | Java 26 |
-| Framework | Spring Boot 4.0.6 |
-| Security | Spring Security + JJWT 0.11.5 |
-| OAuth2 | Spring Security OAuth2 Client |
-| ORM | Spring Data JPA (Hibernate) |
-| Validation | Jakarta Bean Validation |
-| Build Tool | Gradle |
-
-### Database
-| Component | Technology |
-|---|---|
-| Primary DB | PostgreSQL |
-| Vector Store (planned) | pgvector (PostgreSQL extension) |
-| ORM Driver | PostgreSQL JDBC |
-
-### Planned Integrations
-| Integration | Purpose |
-|---|---|
-| OpenAI API | Embedding generation + LLM for RAG assistant |
-| pgvector | Semantic similarity search over course content |
-| Razorpay | Payment processing for course enrollment |
+| Framework | Spring Boot 4.x |
+| Security | Spring Security 7.x, JJWT 0.12.6 |
+| OAuth2 | Spring Security OAuth2 Client (Google) |
+| ORM | Spring Data JPA / Hibernate |
+| Database | PostgreSQL (production), H2 (tests) |
+| Build | Gradle |
 
 ---
 
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                        Client (Browser / App)                │
-└──────────────────┬───────────────────────────────────────────┘
-                   │  HTTP (JWT in HTTP-only cookie)
-┌──────────────────▼───────────────────────────────────────────┐
-│                    Spring Boot Application                    │
-│                                                              │
-│  ┌────────────┐  ┌────────────┐  ┌──────────────────────┐   │
-│  │ Controllers│→ │  Services  │→ │    Repositories      │   │
-│  │ /auth      │  │ UserService│  │ UserRepository       │   │
-│  │ /course    │  │CourseService│  │ CourseRepository     │   │
-│  └────────────┘  └────────────┘  │ AuthorRepository     │   │
-│                                  └──────────┬───────────┘   │
-│  ┌─────────────────────────────┐            │               │
-│  │       Security Layer        │            │               │
-│  │  JwtUtils (HS256, 48h)      │            │               │
-│  │  BCryptPasswordEncoder      │            │               │
-│  │  HTTP-only cookie transport │            │               │
-│  └─────────────────────────────┘            │               │
-└─────────────────────────────────────────────┼───────────────┘
-                                              │
-┌─────────────────────────────────────────────▼───────────────┐
-│                        PostgreSQL                            │
-│                                                              │
-│   users          courses         author                      │
-│   ─────────      ─────────       ──────                      │
-│   id             id              author_id                   │
-│   name           title           author_name                 │
-│   username       author_id                                   │
-│   email                                                      │
-│   password       (pgvector planned for course embeddings)    │
-│   role                                                       │
-└──────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│                   Client (Browser / App)                │
+└──────────────────┬──────────────────────────────────────┘
+                   │  HTTP  (JWT in HttpOnly cookie)
+┌──────────────────▼──────────────────────────────────────┐
+│                 Spring Boot Application                  │
+│                                                         │
+│  JwtFilters (OncePerRequestFilter)                      │
+│       ↓  extract + validate JWT from cookie             │
+│       ↓  set SecurityContext                            │
+│                                                         │
+│  Controllers  →  Services  →  Repositories              │
+│  /auth/**        UserService    UserRepository          │
+│  /course/**      CourseService  CourseRepository        │
+│                               AuthorRepository          │
+│                                                         │
+│  Security Layer                                         │
+│  ├─ BCryptPasswordEncoder (password hashing)            │
+│  ├─ JwtUtils (HS256, 48h tokens)                       │
+│  ├─ Oauth2SuccessHandler (provisions new OAuth users)  │
+│  └─ RoleHierarchy: ADMIN→AUTHOR→STUDENT                │
+└──────────────────┬──────────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────────┐
+│                    PostgreSQL                            │
+│                                                         │
+│  users          author          courses                  │
+│  ─────          ──────          ───────                  │
+│  id             author_id       id                       │
+│  name           author_name     title                    │
+│  username       user_id (FK)    author_id (FK)           │
+│  email                                                   │
+│  password                                                │
+│  role                                                    │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### Planned RAG Architecture
+**Request flow:**
+1. Request arrives → `JwtFilters` reads `jwt` cookie
+2. If valid JWT: extract email → load user → set `SecurityContext`
+3. Spring Security checks role against endpoint rules
+4. Controller delegates to Service → Repository → DB
+
+---
+
+## Roles & Permissions
+
+Role hierarchy is enforced at both the HTTP route level and via `@PreAuthorize`:
 
 ```
-Student Question
-      │
-      ▼
-  OpenAI Embeddings API
-      │  (text → vector)
-      ▼
-  pgvector similarity search  ──→  Relevant course chunks
-      │
-      ▼
-  OpenAI Chat API (GPT-4)
-  + retrieved context
-      │
-      ▼
-  AI Answer grounded in
-  actual course content
+ADMIN  ──inherits──▶  AUTHOR  ──inherits──▶  STUDENT
 ```
 
-### Planned Payment Flow
+| Role | Endpoint Access |
+|------|----------------|
+| `STUDENT` | `GET /course`, `GET /course/{id}` |
+| `AUTHOR` | All of above + `POST /course/create-course`, `/author/**` |
+| `ADMIN` | All of above + `/admin/**` |
 
+---
+
+## API Reference
+
+### Auth — `/auth/**` (public, no JWT required)
+
+#### `POST /auth/signup`
+
+Register a new user. Returns a JWT stored as an HttpOnly cookie.
+
+**Request Body**
+```json
+{
+  "name": "Junaid Khan",
+  "username": "junaid_dev",
+  "email": "junaid@example.com",
+  "password": "Secret123",
+  "role": "STUDENT"
+}
 ```
-Student clicks "Enroll"
-      │
-      ▼
-  LearnVault creates Razorpay order
-      │
-      ▼
-  Razorpay Checkout (frontend)
-      │  (payment captured)
-      ▼
-  Razorpay webhook → LearnVault
-      │  (verify signature)
-      ▼
-  Enrollment record created
-  Student gets access to course
+
+| Field | Rules |
+|-------|-------|
+| `name` | 3–50 characters, required |
+| `username` | 8–15 characters, letters/numbers/underscore only |
+| `email` | Valid email format |
+| `password` | 8–20 chars, must contain digit + lowercase + uppercase |
+| `role` | `STUDENT`, `AUTHOR`, or `ADMIN` |
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | Registered. Cookie `jwt` set. |
+| `400 Bad Request` | Validation error (field errors returned) |
+| `409 Conflict` | User already exists |
+
+---
+
+#### `POST /auth/login`
+
+Login with email or username + password.
+
+**Request Body**
+```json
+{
+  "email": "junaid@example.com",
+  "password": "Secret123"
+}
+```
+_(Use `username` instead of `email` if preferred.)_
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | Logged in. Cookie `jwt` set. |
+| `401 Unauthorized` | Invalid credentials |
+| `400 Bad Request` | Validation error |
+
+---
+
+#### `POST /auth/logout`
+
+Clears the JWT cookie by setting `max-age=0`.
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | Cookie expired |
+
+---
+
+### Courses — `/course/**` (requires JWT)
+
+#### `POST /course/create-course` — `AUTHOR` only
+
+Create a course. The author is automatically linked to the authenticated user — no need to pass an author name.
+
+**Request Body**
+```json
+{
+  "title": "Spring Boot for Beginners"
+}
+```
+
+| Status | Meaning |
+|--------|---------|
+| `201 Created` | Course created, returns `CourseResponseDto` |
+| `400 Bad Request` | Validation error |
+| `401 Unauthorized` | Not authenticated |
+| `403 Forbidden` | Wrong role |
+| `409 Conflict` | Course with same title already exists for this author |
+
+**Response**
+```json
+{
+  "id": 1,
+  "title": "Spring Boot for Beginners",
+  "authorName": "Junaid Khan"
+}
 ```
 
 ---
 
-## Project Structure
+#### `GET /course` — `STUDENT` and above
 
-```
-src/main/java/learn_vault/
-├── LearnVaultApplication.java          # Application entry point
-│
-├── controller/
-│   ├── UserController.java             # /auth — registration & auth
-│   └── CourseController.java           # /course — course CRUD
-│
-├── service/
-│   ├── UserService.java                # Registration, JWT issuance
-│   └── CourseService.java              # Course & author management
-│
-├── repositories/
-│   ├── UserRepository.java             # User DB queries
-│   ├── CourseRepository.java           # Course DB queries
-│   └── AuthorRepository.java          # Author DB queries
-│
-├── entities/
-│   ├── UserEntity.java                 # users table
-│   ├── CourseEntity.java               # courses table
-│   └── AuthorEntity.java              # author table
-│
-├── dto/
-│   ├── SignupDto.java                  # Registration request body
-│   └── CourseDto.java                  # Course creation request body
-│
-├── enums/
-│   └── Role.java                       # STUDENT | INSTRUCTOR | ADMIN
-│
-└── utils/
-    ├── AppConfig.java                  # BCryptPasswordEncoder bean
-    └── JwtUtils.java                   # JWT generation (HS256)
+List all courses.
 
-src/main/resources/
-├── application.yml                     # Profile selector
-└── application-local.yml               # Local dev config (gitignored)
+```json
+[
+  { "id": 1, "title": "Spring Boot for Beginners", "authorName": "Junaid Khan" }
+]
 ```
+
+---
+
+#### `GET /course/{id}` — `STUDENT` and above
+
+Get a single course.
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | Returns `CourseResponseDto` |
+| `404 Not Found` | Course not found |
+
+---
+
+### OAuth2 — Google Login
+
+| Step | URL |
+|------|-----|
+| Initiate login | `GET /oauth2/authorization/google` |
+| Callback (handled by Spring) | `GET /login/oauth2/code/google` |
+
+On success, a new `STUDENT` user is provisioned (first login only) and a JWT cookie is set. The browser is redirected to `app.oauth2-redirect` (configurable).
 
 ---
 
@@ -218,147 +247,22 @@ CREATE TABLE users (
     name        VARCHAR(50)  NOT NULL,
     username    VARCHAR(15)  NOT NULL UNIQUE,
     email       VARCHAR(255) NOT NULL UNIQUE,
-    password    VARCHAR(255),
-    role        VARCHAR(20)  NOT NULL DEFAULT 'STUDENT'
+    password    VARCHAR(255),           -- NULL for OAuth2 users
+    role        VARCHAR(20)  NOT NULL
 );
 
 CREATE TABLE author (
     author_id   BIGSERIAL PRIMARY KEY,
-    author_name VARCHAR(255) NOT NULL
+    author_name VARCHAR(255) NOT NULL,
+    user_id     BIGINT UNIQUE REFERENCES users(id)
 );
 
 CREATE TABLE courses (
     id          BIGSERIAL PRIMARY KEY,
-    title       VARCHAR(255) NOT NULL UNIQUE,
+    title       VARCHAR(255) NOT NULL,
     author_id   BIGINT NOT NULL REFERENCES author(author_id)
 );
 ```
-
-> **Planned:** `course_enrollments` join table, `course_embeddings` with pgvector column for RAG, `payments` table for Razorpay transaction records.
-
----
-
-## API Reference
-
-### Auth — `/auth`
-
-#### `POST /auth/signup`
-
-Register a new user. Returns a JWT stored as an HTTP-only cookie.
-
-**Request Body**
-```json
-{
-  "name": "Junaid Khan",
-  "username": "junaid_dev",
-  "email": "junaid@example.com",
-  "password": "Secret123"
-}
-```
-
-**Validation Rules**
-
-| Field | Rules |
-|---|---|
-| `name` | 2–50 characters, required |
-| `username` | 8–15 characters, alphanumeric + underscore only |
-| `email` | Valid email format |
-| `password` | 8–20 chars, must contain digit + lowercase + uppercase |
-
-**Responses**
-
-| Status | Body |
-|---|---|
-| `200 OK` | `"User registered successfully."` + `Set-Cookie: jwt=<token>; HttpOnly` |
-| `400 Bad Request` | Validation error or `"User already exists"` |
-
----
-
-### Courses — `/course`
-
-#### `POST /course/create-course`
-
-Create a new course. Automatically creates the author if they don't exist.
-
-**Request Body**
-```json
-{
-  "title": "Spring Boot for Beginners",
-  "authorName": "Junaid Khan"
-}
-```
-
-**Responses**
-
-| Status | Body |
-|---|---|
-| `200 OK` | `"Course created successfully."` |
-| `200 OK` | `"Course already exists for this author."` |
-
----
-
-#### `GET /course/`
-
-Fetch all courses.
-
-**Response**
-```json
-[
-  {
-    "id": 1,
-    "title": "Spring Boot for Beginners",
-    "authorId": 1
-  }
-]
-```
-
----
-
-#### `GET /course/{id}`
-
-Fetch a single course by ID.
-
-**Response**
-```json
-{
-  "id": 1,
-  "title": "Spring Boot for Beginners",
-  "authorId": 1
-}
-```
-
-| Status | Body |
-|---|---|
-| `200 OK` | Course object |
-| `404 Not Found` | Empty (course not found) |
-
----
-
-## Security Model
-
-### JWT
-
-- **Algorithm:** HMAC-SHA256 (HS256)
-- **Expiration:** 48 hours
-- **Subject:** User email
-- **Transport:** HTTP-only cookie (named `jwt`, path `/`)
-- **Key:** Generated at startup with `Keys.secretKeyFor(SignatureAlgorithm.HS256)`
-
-> The key is regenerated on each application restart. For production, externalize the secret to an environment variable or secrets manager.
-
-### Password Storage
-
-Passwords are hashed with **BCrypt** before persistence. Plain-text passwords are never stored or logged.
-
-### Roles
-
-| Role | Intended Permissions |
-|---|---|
-| `STUDENT` | Default role. Browse and enroll in courses. |
-| `INSTRUCTOR` | Create and manage courses. |
-| `ADMIN` | Full platform management. |
-
-> Role-based endpoint authorization is currently planned — the `SecurityFilterChain` and JWT validation filter are not yet implemented.
 
 ---
 
@@ -366,11 +270,11 @@ Passwords are hashed with **BCrypt** before persistence. Plain-text passwords ar
 
 ### Prerequisites
 
-- Java 26+
+- Java 26
 - PostgreSQL 15+
-- Gradle (wrapper included)
+- Google OAuth2 credentials (from [Google Cloud Console](https://console.cloud.google.com))
 
-### 1. Clone the repository
+### 1. Clone
 
 ```bash
 git clone https://github.com/your-username/learn-vault.git
@@ -383,100 +287,146 @@ cd learn-vault
 CREATE DATABASE learnvault;
 ```
 
-### 3. Configure local properties
-
-Create `src/main/resources/application-local.yml`:
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/learnvault
-    username: your_db_user
-    password: your_db_password
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: YOUR_GOOGLE_CLIENT_ID
-            client-secret: YOUR_GOOGLE_CLIENT_SECRET
-```
-
-### 4. Run the application
+### 3. Set environment variables
 
 ```bash
-./gradlew bootRun
+export GOOGLE_CLIENT_ID=your-google-client-id
+export GOOGLE_CLIENT_SECRET=your-google-client-secret
+# Optional (defaults shown):
+export DB_URL=jdbc:postgresql://localhost:5432/learnvault
+export DB_USERNAME=postgres
+export DB_PASSWORD=postgres
+export JWT_SECRET=2tTNCo6t7U7TuHA0pvsHkzToD4Eabq/iV/3mNpqHs1M=
 ```
 
-The server starts on `http://localhost:8080`.
-
-### 5. Test the signup endpoint
+### 4. Run with local profile
 
 ```bash
-curl -X POST http://localhost:8080/auth/signup \
+./gradlew bootRun --args='--spring.profiles.active=local'
+```
+
+Server starts on `http://localhost:8001`.
+
+### 5. Quick smoke test
+
+```bash
+# Signup
+curl -c cookies.txt -X POST http://localhost:8001/auth/signup \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "Test User",
-    "username": "testuser1",
-    "email": "test@example.com",
-    "password": "Secret123"
-  }'
+  -d '{"name":"Test User","username":"testuser1","email":"test@example.com","password":"Secret123","role":"STUDENT"}'
+
+# List courses (uses the cookie from signup)
+curl -b cookies.txt http://localhost:8001/course
 ```
 
 ---
 
 ## Environment Configuration
 
-| Property | Description | Required |
-|---|---|---|
-| `spring.datasource.url` | PostgreSQL JDBC URL | Yes |
-| `spring.datasource.username` | DB username | Yes |
-| `spring.datasource.password` | DB password | Yes |
-| `spring.security.oauth2.client.registration.google.client-id` | Google OAuth2 client ID | Optional |
-| `spring.security.oauth2.client.registration.google.client-secret` | Google OAuth2 client secret | Optional |
+| Property | Env Var | Default | Description |
+|----------|---------|---------|-------------|
+| `spring.datasource.url` | `DB_URL` | `jdbc:postgresql://localhost:5432/learnvault` | Database URL |
+| `spring.datasource.username` | `DB_USERNAME` | `postgres` | DB user |
+| `spring.datasource.password` | `DB_PASSWORD` | `postgres` | DB password |
+| `spring.jpa.hibernate.ddl-auto` | `DDL_AUTO` | `update` | Schema strategy |
+| `jwt.secret` | `JWT_SECRET` | dev default | Base64 HMAC-SHA256 key (min 256 bits) |
+| `app.oauth2-redirect` | `OAUTH2_REDIRECT_URL` | `http://localhost:5173/dashboard` | Post-OAuth2 frontend redirect |
+| `app.cookie-secure` | `COOKIE_SECURE` | `false` | Set `true` in production (HTTPS required) |
+| `server.port` | `SERVER_PORT` | `8001` | HTTP port |
 
-> Keep `application-local.yml` out of version control. It is listed in `.gitignore`.
+---
+
+## Running Tests
+
+Tests use H2 in-memory database — no external services required.
+
+```bash
+./gradlew test
+```
+
+Test coverage includes:
+- `JwtUtilsTest` — token generation, validation, extraction, tamper detection
+- `UserServiceTest` — signup, login success/failure, author provisioning
+- `CourseServiceTest` — creation, duplicate detection, author auto-creation
+- `LoginControllerTest` — HTTP responses, cookie behavior, validation
+- `CourseControllerTest` — role-based access, HTTP status codes, 404 handling
+
+---
+
+## Production Checklist
+
+- [ ] Set `COOKIE_SECURE=true` (requires HTTPS / TLS terminator)
+- [ ] Use a cryptographically random `JWT_SECRET` (≥256 bits, Base64-encoded)
+- [ ] Set `DDL_AUTO=validate` — never `update` in production
+- [ ] Rotate Google OAuth2 credentials (never commit them)
+- [ ] Add `.env` to `.gitignore`
+- [ ] Configure CORS for your frontend origin
+- [ ] Set up database connection pooling (HikariCP is included)
+- [ ] Put the app behind a reverse proxy (nginx / ALB) with HTTPS
+
+---
+
+## Project Structure
+
+```
+src/main/java/learn_vault/
+├── LearnVaultApplication.java
+├── controller/
+│   ├── LoginController.java       # /auth/login, /auth/logout
+│   ├── UserController.java        # /auth/signup
+│   └── CourseController.java      # /course/**
+├── service/
+│   ├── UserService.java
+│   ├── CourseService.java
+│   └── CustomUserDetailsService.java
+├── entities/
+│   ├── UserEntity.java
+│   ├── AuthorEntity.java
+│   └── CourseEntity.java
+├── dto/
+│   ├── SignupDto.java
+│   ├── LoginDto.java
+│   ├── CourseDto.java
+│   └── CourseResponseDto.java     # Safe serialization (no circular refs)
+├── repositories/
+│   ├── UserRepository.java
+│   ├── AuthorRepository.java
+│   └── CourseRepository.java
+├── enums/
+│   └── Role.java                  # STUDENT | AUTHOR | ADMIN
+└── utils/
+    ├── SecurityConfig.java         # Filter chain, route rules
+    ├── AppConfig.java              # Beans: encoder, auth provider, hierarchy
+    ├── JwtUtils.java               # HS256 token generation & validation
+    ├── JwtFilters.java             # Cookie → SecurityContext per request
+    ├── Oauth2SuccessHandler.java   # User provisioning + cookie on OAuth2
+    └── GlobalExceptionHandler.java # Unified error responses
+```
 
 ---
 
 ## Roadmap
 
-### Phase 1 — Authentication & Authorization (Current)
-- [x] User registration with BCrypt + JWT
-- [ ] Login endpoint
-- [ ] JWT validation filter (`OncePerRequestFilter`)
-- [ ] Role-based `SecurityFilterChain`
-- [ ] Google OAuth2 login
-
 ### Phase 2 — Course Platform
 - [ ] Full CRUD for courses (update, delete)
 - [ ] Course enrollment system
-- [ ] Instructor dashboard
 - [ ] Pagination on listing endpoints
+- [ ] Admin user management endpoints
 
 ### Phase 3 — Payments (Razorpay)
-- [ ] Create Razorpay order on enrollment request
-- [ ] Razorpay Checkout integration
+- [ ] Create Razorpay order on enrollment
 - [ ] Webhook handler with signature verification
-- [ ] Payment records and enrollment gating
+- [ ] Enrollment gating on payment success
 
 ### Phase 4 — AI Assistant (RAG + OpenAI + pgvector)
-- [ ] Install `pgvector` extension in PostgreSQL
-- [ ] Course content chunking and embedding via OpenAI API
-- [ ] Store embeddings in pgvector column
-- [ ] Semantic similarity search endpoint
-- [ ] RAG pipeline: embed question → retrieve chunks → GPT-4 answer
-- [ ] `/assistant/ask` endpoint for students
+- [ ] pgvector extension in PostgreSQL
+- [ ] Course content chunking + embedding via OpenAI API
+- [ ] Semantic search endpoint
+- [ ] `/assistant/ask` — RAG pipeline for student Q&A
 
 ---
 
 ## Contributing
-
-Contributions are welcome. The project follows a standard fork → branch → PR workflow.
 
 1. Fork the repo
 2. Create a feature branch: `git checkout -b feat/your-feature`
@@ -487,4 +437,4 @@ Contributions are welcome. The project follows a standard fork → branch → PR
 
 ## License
 
-This project is open-source. License to be added.
+MIT
