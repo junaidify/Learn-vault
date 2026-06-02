@@ -1,13 +1,15 @@
 package learn_vault.service;
 
-import learn_vault.dto.CourseDto;
-import learn_vault.dto.CourseResponseDto;
-import learn_vault.entities.AuthorEntity;
-import learn_vault.entities.CourseEntity;
-import learn_vault.entities.UserEntity;
-import learn_vault.repositories.AuthorRepository;
-import learn_vault.repositories.CourseRepository;
-import learn_vault.repositories.UserRepository;
+import learn_vault.dto.request.CourseDto;
+import learn_vault.dto.response.CourseResponseDto;
+import learn_vault.entity.AuthorEntity;
+import learn_vault.entity.CourseEntity;
+import learn_vault.entity.UserEntity;
+import learn_vault.exception.DuplicateResourceException;
+import learn_vault.exception.ResourceNotFoundException;
+import learn_vault.repository.AuthorRepository;
+import learn_vault.repository.CourseRepository;
+import learn_vault.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -35,13 +37,13 @@ public class CourseService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         AuthorEntity author = authorRepository.findByUser(user)
                 .orElseGet(() -> authorRepository.save(new AuthorEntity(user.getName(), user)));
 
         if (courseRepository.existsByTitleAndAuthor_AuthorId(dto.getTitle(), author.getAuthorId())) {
-            throw new IllegalStateException("Course already exists under this author");
+            throw new DuplicateResourceException("Course already exists under this author");
         }
 
         CourseEntity course = courseRepository.save(new CourseEntity(dto.getTitle(), author));
@@ -57,7 +59,10 @@ public class CourseService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<CourseResponseDto> getCourse(Long id) {
-        return courseRepository.findById(id).map(CourseResponseDto::new);
+    public CourseResponseDto getCourse(Long id) {
+        CourseEntity course = courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course with ID " + id + " not found"));
+
+        return new CourseResponseDto(course);
     }
 }

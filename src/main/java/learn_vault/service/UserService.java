@@ -1,13 +1,14 @@
 package learn_vault.service;
 
-import learn_vault.dto.LoginDto;
-import learn_vault.dto.SignupDto;
-import learn_vault.entities.AuthorEntity;
-import learn_vault.entities.UserEntity;
+import learn_vault.dto.request.LoginDto;
+import learn_vault.dto.request.SignupDto;
+import learn_vault.entity.AuthorEntity;
+import learn_vault.entity.UserEntity;
 import learn_vault.enums.Role;
-import learn_vault.repositories.AuthorRepository;
-import learn_vault.repositories.UserRepository;
-import learn_vault.utils.JwtUtils;
+import learn_vault.exception.DuplicateResourceException;
+import learn_vault.repository.AuthorRepository;
+import learn_vault.repository.UserRepository;
+import learn_vault.security.JwtUtils;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,13 @@ public class UserService {
     @Transactional
     public String userSignUp(SignupDto dto) {
         if (userRepository.existsByUsernameOrEmail(dto.getUsername(), dto.getEmail())) {
-            throw new IllegalStateException("User already exists");
+            throw new DuplicateResourceException("User already exists");
+        }
+
+        Role role = dto.getRole() != null ? dto.getRole() : Role.STUDENT;
+
+        if(dto.getRole() == null){
+            throw new IllegalArgumentException("Role is required.");
         }
 
         UserEntity newUser = new UserEntity(
@@ -42,14 +49,13 @@ public class UserService {
                 dto.getUsername(),
                 dto.getEmail(),
                 passwordEncoder.encode(dto.getPassword()),
-                dto.getRole()
+                role
         );
         userRepository.save(newUser);
 
-        if (dto.getRole() == Role.AUTHOR) {
+        if(role == Role.AUTHOR){
             authorRepository.save(new AuthorEntity(dto.getName(), newUser));
         }
-
         return jwtUtils.jwtGeneration(newUser.getEmail());
     }
 

@@ -1,12 +1,12 @@
 package learn_vault.service;
 
-import learn_vault.dto.LoginDto;
-import learn_vault.dto.SignupDto;
-import learn_vault.entities.UserEntity;
+import learn_vault.dto.request.LoginDto;
+import learn_vault.dto.request.SignupDto;
+import learn_vault.entity.UserEntity;
 import learn_vault.enums.Role;
-import learn_vault.repositories.AuthorRepository;
-import learn_vault.repositories.UserRepository;
-import learn_vault.utils.JwtUtils;
+import learn_vault.repository.AuthorRepository;
+import learn_vault.repository.UserRepository;
+import learn_vault.security.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +30,8 @@ class UserServiceTest {
     @Mock UserRepository userRepository;
     @Mock AuthorRepository authorRepository;
     @Mock PasswordEncoder passwordEncoder;
-    @Mock JwtUtils jwtUtils;
+    @Mock
+    JwtUtils jwtUtils;
 
     @InjectMocks UserService userService;
 

@@ -1,7 +1,7 @@
 package learn_vault.controller;
 
 import jakarta.validation.Valid;
-import learn_vault.dto.LoginDto;
+import learn_vault.dto.request.LoginDto;
 import learn_vault.service.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;

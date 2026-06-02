@@ -1,6 +1,6 @@
-package learn_vault.dto;
+package learn_vault.dto.response;
 
-import learn_vault.entities.CourseEntity;
+import learn_vault.entity.CourseEntity;
 import lombok.Getter;
 
 @Getter

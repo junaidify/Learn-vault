@@ -1,4 +1,4 @@
-package learn_vault.dto;
+package learn_vault.dto.request;
 
 import jakarta.validation.constraints.*;
 import learn_vault.enums.Role;

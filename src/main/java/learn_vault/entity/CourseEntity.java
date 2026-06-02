@@ -1,4 +1,4 @@
-package learn_vault.entities;
+package learn_vault.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

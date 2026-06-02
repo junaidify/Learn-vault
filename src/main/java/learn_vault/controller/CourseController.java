@@ -1,8 +1,8 @@
 package learn_vault.controller;
 
 import jakarta.validation.Valid;
-import learn_vault.dto.CourseDto;
-import learn_vault.dto.CourseResponseDto;
+import learn_vault.dto.request.CourseDto;
+import learn_vault.dto.response.CourseResponseDto;
 import learn_vault.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +34,6 @@ public class CourseController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CourseResponseDto> getCourse(@PathVariable Long id) {
-        return courseService.getCourse(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(courseService.getCourse(id));
     }
 }

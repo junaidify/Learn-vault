@@ -1,4 +1,4 @@
-package learn_vault.utils;
+package learn_vault.security;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
