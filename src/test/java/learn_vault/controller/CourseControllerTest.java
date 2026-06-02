@@ -1,15 +1,15 @@
 package learn_vault.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import learn_vault.dto.CourseDto;
-import learn_vault.dto.CourseResponseDto;
-import learn_vault.entities.AuthorEntity;
-import learn_vault.entities.CourseEntity;
+import learn_vault.dto.request.CourseDto;
+import learn_vault.dto.response.CourseResponseDto;
+import learn_vault.entity.AuthorEntity;
+import learn_vault.entity.CourseEntity;
 import learn_vault.service.CourseService;
 import learn_vault.service.CustomUserDetailsService;
-import learn_vault.utils.GlobalExceptionHandler;
-import learn_vault.utils.JwtFilters;
-import learn_vault.utils.JwtUtils;
+import learn_vault.exception.GlobalExceptionHandler;
+import learn_vault.security.JwtFilters;
+import learn_vault.security.JwtUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

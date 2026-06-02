@@ -1,5 +1,6 @@
-package learn_vault.utils;
+package learn_vault.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,10 +33,27 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "Invalid credentials"));
     }
 
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Map<String, String>> handleConflict(IllegalStateException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("error", ex.getMessage()));
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateResouces(DuplicateResourceException ex,
+                                                                       HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "timestamp", LocalDateTime.now(), "message", ex.getMessage(),
+                        "status", HttpStatus.CONFLICT.value(), "error", "Conflict",
+                        "path", request.getRequestURI()
+                ));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex,
+                                                                      HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "message", ex.getMessage(),
+                "error", "Not Found",
+                "status", HttpStatus.NOT_FOUND.value(),
+                "path", request.getRequestURI()
+
+        ));
     }
 
     @ExceptionHandler(RuntimeException.class)

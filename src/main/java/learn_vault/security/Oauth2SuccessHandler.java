@@ -1,11 +1,11 @@
-package learn_vault.utils;
+package learn_vault.security;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import learn_vault.entities.UserEntity;
+import learn_vault.entity.UserEntity;
 import learn_vault.enums.Role;
-import learn_vault.repositories.UserRepository;
+import learn_vault.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;

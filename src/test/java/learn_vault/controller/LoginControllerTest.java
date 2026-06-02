@@ -1,12 +1,11 @@
 package learn_vault.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import learn_vault.dto.LoginDto;
+import learn_vault.dto.request.LoginDto;
 import learn_vault.service.UserService;
-import learn_vault.utils.AppConfig;
-import learn_vault.utils.GlobalExceptionHandler;
-import learn_vault.utils.JwtFilters;
-import learn_vault.utils.JwtUtils;
+import learn_vault.exception.GlobalExceptionHandler;
+import learn_vault.security.JwtFilters;
+import learn_vault.security.JwtUtils;
 import learn_vault.service.CustomUserDetailsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

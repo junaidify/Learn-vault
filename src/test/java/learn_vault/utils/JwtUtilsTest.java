@@ -1,6 +1,7 @@
 package learn_vault.utils;
 
 import io.jsonwebtoken.JwtException;
+import learn_vault.security.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

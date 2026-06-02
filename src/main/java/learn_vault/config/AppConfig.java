@@ -1,4 +1,4 @@
-package learn_vault.utils;
+package learn_vault.config;
 
 import learn_vault.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;

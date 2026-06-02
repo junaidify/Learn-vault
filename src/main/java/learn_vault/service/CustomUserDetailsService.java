@@ -1,7 +1,7 @@
 package learn_vault.service;
 
-import learn_vault.entities.UserEntity;
-import learn_vault.repositories.UserRepository;
+import learn_vault.entity.UserEntity;
+import learn_vault.repository.UserRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,7 +22,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException{
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
-
 
         return User.builder()
                 .username(user.getEmail())
