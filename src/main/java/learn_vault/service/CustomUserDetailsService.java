@@ -1,6 +1,6 @@
 package learn_vault.service;
 
-import learn_vault.entity.UserEntity;
+import learn_vault.entity.user.UserEntity;
 import learn_vault.repository.UserRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,6 +1,6 @@
 package learn_vault.repository;
 
-import learn_vault.entity.UserEntity;
+import learn_vault.entity.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

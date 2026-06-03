@@ -3,7 +3,7 @@ package learn_vault.security;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import learn_vault.entity.UserEntity;
+import learn_vault.entity.user.UserEntity;
 import learn_vault.enums.Role;
 import learn_vault.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;

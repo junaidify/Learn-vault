@@ -2,7 +2,7 @@ package learn_vault.service;
 
 import learn_vault.dto.request.LoginDto;
 import learn_vault.dto.request.SignupDto;
-import learn_vault.entity.UserEntity;
+import learn_vault.entity.user.UserEntity;
 import learn_vault.enums.Role;
 import learn_vault.repository.AuthorRepository;
 import learn_vault.repository.UserRepository;

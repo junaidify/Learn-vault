@@ -1,7 +1,9 @@
-package learn_vault.entity;
+package learn_vault.entity.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import learn_vault.entity.BaseEntity;
+import learn_vault.entity.course.CourseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString(exclude = {"courses", "user"})
-public class AuthorEntity {
+public class AuthorEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long authorId;

@@ -33,12 +33,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login/oauth2/code/**", "/oauth2/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/author/**").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers("api/v1/auth/**").permitAll()
+                        .requestMatchers("api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("api/v1/author/**").hasAnyRole("ADMIN", "AUTHOR")
                         // create-course must be matched before the wildcard /course/**
-                        .requestMatchers("/course/create-course").hasAnyRole("ADMIN", "AUTHOR")
-                        .requestMatchers("/course/**").hasAnyRole("ADMIN", "AUTHOR", "STUDENT")
+                        .requestMatchers("api/v1/courses/create-course").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers("api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR", "STUDENT")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth -> oauth.successHandler(oauth2SuccessHandler))
