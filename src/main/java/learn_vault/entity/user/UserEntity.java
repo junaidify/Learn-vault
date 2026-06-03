@@ -1,8 +1,9 @@
-package learn_vault.entity;
+package learn_vault.entity.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import learn_vault.entity.BaseEntity;
 import learn_vault.enums.Role;
 
 @Entity
@@ -11,7 +12,7 @@ uniqueConstraints = {
         @UniqueConstraint(columnNames = "email"),
         @UniqueConstraint(columnNames = "username")
 })
-public class UserEntity {
+public class UserEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

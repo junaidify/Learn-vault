@@ -2,9 +2,9 @@ package learn_vault.service;
 
 import learn_vault.dto.request.CourseDto;
 import learn_vault.dto.response.CourseResponseDto;
-import learn_vault.entity.AuthorEntity;
-import learn_vault.entity.CourseEntity;
-import learn_vault.entity.UserEntity;
+import learn_vault.entity.user.AuthorEntity;
+import learn_vault.entity.course.CourseEntity;
+import learn_vault.entity.user.UserEntity;
 import learn_vault.enums.Role;
 import learn_vault.repository.AuthorRepository;
 import learn_vault.repository.CourseRepository;

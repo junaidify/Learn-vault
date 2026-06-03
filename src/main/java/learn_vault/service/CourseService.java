@@ -2,21 +2,21 @@ package learn_vault.service;
 
 import learn_vault.dto.request.CourseDto;
 import learn_vault.dto.response.CourseResponseDto;
-import learn_vault.entity.AuthorEntity;
-import learn_vault.entity.CourseEntity;
-import learn_vault.entity.UserEntity;
+import learn_vault.entity.user.AuthorEntity;
+import learn_vault.entity.course.CourseEntity;
+import learn_vault.entity.user.UserEntity;
 import learn_vault.exception.DuplicateResourceException;
 import learn_vault.exception.ResourceNotFoundException;
 import learn_vault.repository.AuthorRepository;
 import learn_vault.repository.CourseRepository;
 import learn_vault.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+
 
 @Service
 public class CourseService {
@@ -51,11 +51,10 @@ public class CourseService {
     }
 
     @Transactional(readOnly = true)
-    public List<CourseResponseDto> getCourses() {
-        return courseRepository.findAll()
-                .stream()
-                .map(CourseResponseDto::new)
-                .toList();
+    public Page<CourseResponseDto> getCourses(Pageable pageable) {
+        Page<CourseEntity> coursePage = courseRepository.findAll(pageable);
+
+        return coursePage.map(course -> mapper.todto(course));
     }
 
     @Transactional(readOnly = true)

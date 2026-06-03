@@ -1,12 +1,14 @@
-package learn_vault.entity;
+package learn_vault.entity.course;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import learn_vault.entity.BaseEntity;
+import learn_vault.entity.user.AuthorEntity;
 
 @Entity
 @Table(name="courses")
-public class CourseEntity {
+public class CourseEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
