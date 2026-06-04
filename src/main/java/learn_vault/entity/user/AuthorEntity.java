@@ -6,7 +6,6 @@ import learn_vault.entity.BaseEntity;
 import learn_vault.entity.course.CourseEntity;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.List;
 
@@ -14,16 +13,15 @@ import java.util.List;
 @Table(name = "author")
 @Getter
 @Setter
-@ToString(exclude = {"courses", "user"})
 public class AuthorEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long authorId;
+    private Long id;
 
     @NotBlank(message = "Author name can't be empty.")
-    private String authorName;
+    private String name;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
@@ -33,11 +31,11 @@ public class AuthorEntity extends BaseEntity {
     protected AuthorEntity() {}
 
     public AuthorEntity(String authorName) {
-        this.authorName = authorName;
+        this.name = authorName;
     }
 
-    public AuthorEntity(String authorName, UserEntity user) {
-        this.authorName = authorName;
+    public AuthorEntity(String name, UserEntity user) {
+        this.name = name;
         this.user = user;
     }
 }
