@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
-    List<CourseEntity> findByAuthor_AuthorId(Long authorId);
-    boolean existsByTitleAndAuthor_AuthorId(String title, Long authorId);
+    List<CourseEntity> findByAuthor_Id(Long authorId);
+    boolean existsByTitleAndAuthor_Id(String title, Long authorId);
     Page<CourseEntity> findAll(Pageable pageable);
 }
