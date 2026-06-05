@@ -25,8 +25,5 @@ public class CourseMapper {
               entity.getCreatedAt(),
               entity.getUpdatedAt()
       );
-
-
-
     }
 }
