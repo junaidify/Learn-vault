@@ -18,9 +18,6 @@ public class AuthorEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Author name can't be empty.")
-    private String name;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
@@ -30,12 +27,7 @@ public class AuthorEntity extends BaseEntity {
 
     protected AuthorEntity() {}
 
-    public AuthorEntity(String authorName) {
-        this.name = authorName;
-    }
-
-    public AuthorEntity(String name, UserEntity user) {
-        this.name = name;
+    public AuthorEntity(UserEntity user) {
         this.user = user;
     }
 }
