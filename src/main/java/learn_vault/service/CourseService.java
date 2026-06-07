@@ -54,7 +54,8 @@ public class CourseService {
             throw new DuplicateResourceException("Course already exists under this author");
         }
 
-        CourseEntity course = courseRepository.save(new CourseEntity(dto.getTitle(), author));
+
+        CourseEntity course = courseRepository.save(new CourseEntity(dto.getTitle(), user.getName()));
         return new CourseResponseDto(course);
     }
 

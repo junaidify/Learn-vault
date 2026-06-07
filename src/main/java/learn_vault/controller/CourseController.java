@@ -40,7 +40,7 @@ public class CourseController {
     public ResponseEntity<Page<CourseResponseDto>> getCourses(@RequestParam(defaultValue = "0") @Min(0) int page,
                                                               @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
                                                               @RequestParam(defaultValue = "createAt") String sortBy,
-                                                              @RequestParam(defaultValue = "DESC") String direction ) {
+                                                              @RequestParam(defaultValue = "DESC") String direction) {
 
         String safeSortBy = ALLOWED_SORT_FIELDS.contains(sortBy) ? sortBy : "createdAt";
 
