@@ -22,13 +22,13 @@ public class CourseEntity extends BaseEntity {
     private Long id;
 
     @NotBlank(message = "Add title of course")
-    private String title;
+    private String name;
 
     @NotBlank(message = "Write something about course")
     private String description;
 
     @Min(value = 0, message = "Price can't be negative. ")
-    private double price;
+    private Long amount;
 
     @NotNull(message = "Choose any of them.")
     @Enumerated(EnumType.STRING)
@@ -44,11 +44,11 @@ public class CourseEntity extends BaseEntity {
 
     protected CourseEntity(){};
 
-    public CourseEntity(String title, String description, double price,
+    public CourseEntity(String name, String description, Long amount,
                         Category category, boolean published, AuthorEntity author){
-        this.title = title;
+        this.name = name;
         this.description = description;
-        this.price = price;
+        this.amount = amount;
         this.category = category;
         this.published = published;
         this.author = author;

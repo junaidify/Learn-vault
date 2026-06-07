@@ -11,3 +11,9 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID:replace-me}
             client-secret: ${GOOGLE_CLIENT_SECRET:replace-me}
             scope: email, profile
+
+
+razorpay:
+  key:
+    id: ${RAZORPAY_KEY_ID:rzp_test_dummy_id}
+    secret: ${RAZORPAY_SECRET_ID:dummy_secret_id_not_to_commit}

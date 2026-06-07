@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class VerifyPaymentRequest {
+public class VerifyPaymentRequestDto {
     @NotNull(message = "Make a payment to access course.")
     private String razorpayPaymentId;
 
