@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 public class CourseResponseDto {
     private final Long id;
-    private final String title;
+    private final String name;
     private final String description;
     private final Long amount;
     private final Category category;
@@ -21,18 +21,16 @@ public class CourseResponseDto {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public CourseResponseDto(Long id, String title, String description,
-                             Category category, Long amount, String authorName,
-                             boolean published, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.amount = amount;
-        this.category = category;
-        this.authorName = authorName ;
-        this.published = published;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public CourseResponseDto(CourseEntity course) {
+        this.id = course.getId();
+        this.name = course.getName();
+        this.description = course.getDescription();
+        this.amount = course.getAmount();
+        this.category = getCategory();
+        this.authorName = course.getAuthor().getUser().getName();
+        this.published = course.getPublished();
+        this.createdAt = course.getCreatedAt();
+        this.updatedAt = course.getUpdatedAt();
     }
 
 }

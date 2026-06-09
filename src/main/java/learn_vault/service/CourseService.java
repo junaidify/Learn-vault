@@ -38,7 +38,7 @@ public class CourseService {
     }
 
     @Transactional
-    public CourseResponseDto courseCreate(CourseDto dto) {
+    public String courseCreate(CourseDto dto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserEntity user = userRepository.findByEmail(email)
@@ -50,20 +50,22 @@ public class CourseService {
 
         AuthorEntity author = authorRepository.findByUserId(user.getId());
 
-        if (courseRepository.existsByTitleAndAuthor_Id(dto.getTitle(), author.getId())) {
+        if (courseRepository.existsByTitleAndAuthor_Id(dto.getName(), author.getId())) {
             throw new DuplicateResourceException("Course already exists under this author");
         }
 
+        CourseEntity course = new CourseEntity(dto.getName(), dto.getDescription(), dto.getAmount(),
+                dto.getCategory(), dto.isPublished(), author);
 
-        CourseEntity course = courseRepository.save(new CourseEntity(dto.getTitle(), user.getName()));
-        return new CourseResponseDto(course);
+        courseRepository.save(course);
+        return "Course created successfully.";
     }
 
     @Transactional(readOnly = true)
     public Page<CourseResponseDto> getCourses(Pageable pageable) {
         Page<CourseEntity> coursePage = courseRepository.findAll(pageable);
 
-        return coursePage.map(course -> courseMapper.toDto(course));
+        return coursePage.map(courseMapper::toDto);
     }
 
     @Transactional(readOnly = true)

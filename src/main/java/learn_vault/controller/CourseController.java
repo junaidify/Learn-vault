@@ -31,9 +31,8 @@ public class CourseController {
 
     @PostMapping("/create-course")
     @PreAuthorize("hasRole('AUTHOR')")
-    public ResponseEntity<CourseResponseDto> courseCreate(@Valid @RequestBody CourseDto dto) {
-        CourseResponseDto created = courseService.courseCreate(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<String> courseCreate(@Valid @RequestBody CourseDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(courseService.courseCreate(dto));
     }
 
     @GetMapping
