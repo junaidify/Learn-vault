@@ -3,21 +3,38 @@ package learn_vault.service;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
+import com.razorpay.Utils;
+import jakarta.transaction.Transactional;
+import learn_vault.dto.request.payment.VerifyPaymentRequestDto;
 import learn_vault.dto.response.CourseAmountResponseDto;
 import learn_vault.entity.course.CourseEntity;
+import learn_vault.entity.enrollment.EnrollmentEntity;
+import learn_vault.entity.user.UserEntity;
+import learn_vault.enums.EnrollmentStatus;
 import learn_vault.exception.ResourceNotFoundException;
 import learn_vault.repository.CourseRepository;
+import learn_vault.repository.EnrollmentRepository;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class PaymentService {
     private final CourseRepository courseRepository;
     private final RazorpayClient razorpayClient;
+    private final EnrollmentRepository enrollmentRepository;
 
-    public PaymentService(CourseRepository courseRepository, RazorpayClient razorpayClient){
+    @Value("${razorpay.key.secret")
+    private String razorpaySecretkey;
+
+    public PaymentService(CourseRepository courseRepository, RazorpayClient razorpayClient,
+                          EnrollmentRepository enrollmentRepository){
         this.courseRepository = courseRepository;
         this.razorpayClient = razorpayClient;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     public CourseAmountResponseDto makePayment(Long courseId){
@@ -51,5 +68,39 @@ public class PaymentService {
                 "INR",
                 course.getName()
         );
+    }
+
+    @Transactional
+    public String verifyPayment(VerifyPaymentRequestDto dto, UserEntity currentUser)  {
+
+        boolean isExist = enrollmentRepository
+                .existsByUserIdOrCourseId(currentUser.getId(), dto.getCourseId());
+
+        if(isExist) return "You are already enrolled in this course!";
+
+        JSONObject options = new JSONObject();
+        options.put("razorpay_payment_id", dto.getRazorpayPaymentId());
+        options.put("razorpay_order_id", dto.getRazorpayOrderId());
+        options.put("razorpay_signature", dto.getSignature());
+
+       try{
+           Utils.verifyPaymentSignature(options, razorpaySecretkey);
+
+       }catch(com.razorpay.RazorpayException e){
+           throw new RuntimeException("Payment verification failed " + e.getMessage());
+       }
+
+       CourseEntity course = courseRepository.findById(dto.getCourseId())
+               .orElseThrow(() -> new ResourceNotFoundException("course doesn't exist with id: " + dto.getCourseId()));
+
+        EnrollmentEntity enrolled = new EnrollmentEntity(
+              course,currentUser, EnrollmentStatus.ACTIVE
+        );
+
+        enrolled.setEnrolledAt(LocalDateTime.now());
+
+        enrollmentRepository.save(enrolled);
+
+        return "Course purchased successfully";
     }
 }

@@ -6,6 +6,7 @@ import learn_vault.entity.user.AuthorEntity;
 import learn_vault.entity.user.UserEntity;
 import learn_vault.enums.Role;
 import learn_vault.exception.DuplicateResourceException;
+import learn_vault.exception.ResourceNotFoundException;
 import learn_vault.repository.AuthorRepository;
 import learn_vault.repository.UserRepository;
 import learn_vault.security.JwtUtils;
@@ -54,7 +55,10 @@ public class UserService {
         userRepository.save(newUser);
 
         if(role == Role.AUTHOR){
-            authorRepository.save(new AuthorEntity(dto.getName(), newUser));
+            UserEntity user = userRepository.findByEmail(dto.getEmail())
+                    .orElseThrow(() -> new ResourceNotFoundException("User didn't exist."));
+
+            authorRepository.save(new AuthorEntity(user));
         }
         return jwtUtils.jwtGeneration(newUser.getEmail());
     }

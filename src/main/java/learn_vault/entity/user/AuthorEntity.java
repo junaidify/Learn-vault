@@ -22,9 +22,6 @@ public class AuthorEntity extends BaseEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
-    private List<CourseEntity> courses;
-
     protected AuthorEntity() {}
 
     public AuthorEntity(UserEntity user) {
