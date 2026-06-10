@@ -317,9 +317,3 @@ Patterns proven here → shipped to:
 > *"Built as a sandbox. Designed like production."*
 
 ---
-
-<div align="center">
-
-⭐ Star this repo if it helped you understand Spring Boot architecture
-
-</div>
