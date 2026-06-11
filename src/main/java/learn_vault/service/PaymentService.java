@@ -28,7 +28,7 @@ public class PaymentService {
     private final EnrollmentRepository enrollmentRepository;
 
     @Value("${razorpay.key.secret")
-    private String razorpaySecretkey;
+    private String razorpaySecretKey;
 
     public PaymentService(CourseRepository courseRepository, RazorpayClient razorpayClient,
                           EnrollmentRepository enrollmentRepository){
@@ -74,7 +74,7 @@ public class PaymentService {
     public String verifyPayment(VerifyPaymentRequestDto dto, UserEntity currentUser)  {
 
         boolean isExist = enrollmentRepository
-                .existsByUserIdOrCourseId(currentUser.getId(), dto.getCourseId());
+                .existsByUser_IdOrCourse_Id(currentUser.getId(), dto.getCourseId());
 
         if(isExist) return "You are already enrolled in this course!";
 
@@ -84,7 +84,7 @@ public class PaymentService {
         options.put("razorpay_signature", dto.getSignature());
 
        try{
-           Utils.verifyPaymentSignature(options, razorpaySecretkey);
+           Utils.verifyPaymentSignature(options, razorpaySecretKey);
 
        }catch(com.razorpay.RazorpayException e){
            throw new RuntimeException("Payment verification failed " + e.getMessage());
@@ -94,10 +94,9 @@ public class PaymentService {
                .orElseThrow(() -> new ResourceNotFoundException("course doesn't exist with id: " + dto.getCourseId()));
 
         EnrollmentEntity enrolled = new EnrollmentEntity(
-              course,currentUser, EnrollmentStatus.ACTIVE
+              course,currentUser, EnrollmentStatus.ACTIVE,
+                LocalDateTime.now()
         );
-
-        enrolled.setEnrolledAt(LocalDateTime.now());
 
         enrollmentRepository.save(enrolled);
 
