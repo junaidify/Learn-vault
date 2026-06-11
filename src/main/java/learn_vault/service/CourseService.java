@@ -27,10 +27,8 @@ public class CourseService {
     private final UserRepository userRepository;
     private final CourseMapper courseMapper;
 
-    public CourseService(CourseRepository courseRepository,
-                         AuthorRepository authorRepository,
-                         UserRepository userRepository,
-                         CourseMapper courseMapper) {
+    public CourseService(CourseRepository courseRepository,AuthorRepository authorRepository,
+                         UserRepository userRepository,CourseMapper courseMapper) {
         this.courseRepository = courseRepository;
         this.authorRepository = authorRepository;
         this.userRepository = userRepository;
@@ -50,7 +48,7 @@ public class CourseService {
 
         AuthorEntity author = authorRepository.findByUserId(user.getId());
 
-        if (courseRepository.existsByTitleAndAuthor_Id(dto.getName(), author.getId())) {
+        if (courseRepository.existsByNameAndAuthor_Id(dto.getName(), author.getId())) {
             throw new DuplicateResourceException("Course already exists under this author");
         }
 

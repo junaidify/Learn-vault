@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "Invalid credentials"));
     }
 
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<Map<String, Object>> handleDuplicateResouces(DuplicateResourceException ex,
                                                                        HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex,
                                                                       HttpServletRequest request){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(

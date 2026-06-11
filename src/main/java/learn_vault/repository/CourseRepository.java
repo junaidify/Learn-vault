@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
     List<CourseEntity> findByAuthor_Id(Long authorId);
-    boolean existsByTitleAndAuthor_Id(String title, Long authorId);
+    boolean existsByNameAndAuthor_Id(String name, Long authorId);
     Page<CourseEntity> findAll(Pageable pageable);
 }

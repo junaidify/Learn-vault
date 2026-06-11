@@ -25,12 +25,12 @@ public class EnrollmentEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @Setter(AccessLevel.NONE)
     @JoinColumn(name = "course_id")
-    private CourseEntity courseId;
+    private CourseEntity course;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @Setter(AccessLevel.NONE)
     @JoinColumn(name = "user_id")
-    private UserEntity userId;
+    private UserEntity user;
 
     @Enumerated(EnumType.STRING)
     private EnrollmentStatus enrollmentStatus;
@@ -39,11 +39,11 @@ public class EnrollmentEntity extends BaseEntity {
 
     protected EnrollmentEntity(){};
 
-    public EnrollmentEntity(CourseEntity courseId, UserEntity userId, EnrollmentStatus enrollmentStatus){
-        this.courseId = courseId;
-        this.userId = userId;
+    public EnrollmentEntity(CourseEntity course, UserEntity user, EnrollmentStatus enrollmentStatus, LocalDateTime enrolledAt){
+        this.course = course;
+        this.user = user;
         this.enrollmentStatus = enrollmentStatus;
-
+        this.enrolledAt = enrolledAt;
     }
 
 }
