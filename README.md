@@ -312,7 +312,7 @@ Patterns proven here → shipped to:
 **Junaid** — Java Full-Stack Developer
 
 [![GitHub](https://img.shields.io/badge/GitHub-junaidify-181717?style=flat-square&logo=github)](https://github.com/junaidify)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/junaidify)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/junaidify-khan)
 
 > *"Built as a sandbox. Designed like production."*
 
