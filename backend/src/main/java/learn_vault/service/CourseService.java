@@ -5,6 +5,7 @@ import learn_vault.dto.response.CourseResponseDto;
 import learn_vault.entity.user.AuthorEntity;
 import learn_vault.entity.course.CourseEntity;
 import learn_vault.entity.user.UserEntity;
+import learn_vault.enums.EnrollmentStatus;
 import learn_vault.enums.Role;
 import learn_vault.exception.DuplicateResourceException;
 import learn_vault.exception.ResourceNotFoundException;
@@ -98,10 +99,13 @@ public class CourseService {
     }
 
     @Transactional(readOnly = true)
-    public CourseResponseDto getCourse(Long id) {
+    public CourseResponseDto getCourse(Long id, UserEntity currentUser) {
         CourseEntity course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course with ID " + id + " not found"));
 
-        return new CourseResponseDto(course);
+        boolean hasAccess = currentUser != null && courseRepository.existsByUserIdAndCourseIdAndStatus(
+             currentUser.getId(), id, EnrollmentStatus.ACTIVE.toString());
+
+        return new CourseResponseDto(course, hasAccess);
     }
 }

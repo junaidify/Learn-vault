@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import learn_vault.dto.request.CourseDto;
 import learn_vault.dto.response.CourseResponseDto;
+import learn_vault.entity.user.UserEntity;
 import learn_vault.service.CourseService;
 import learn_vault.service.S3Service;
 import org.springframework.data.domain.PageRequest;
@@ -13,12 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.List;
 
@@ -43,11 +43,11 @@ public class CourseController {
         String url = s3Service.uploadVideo(videoUrl);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(courseService.courseCreate(dto, videoUrl));
+                .body(courseService.courseCreate(dto, url));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCourse(@RequestParam Long id){
+    public ResponseEntity<String> deleteCourse(@PathVariable Long id){
         courseService.deleteCourse(id);
         return ResponseEntity.ok("Course deleted successfully.");
     }
@@ -76,7 +76,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CourseResponseDto> getCourse(@PathVariable Long id) {
-        return ResponseEntity.ok(courseService.getCourse(id));
+    public ResponseEntity<CourseResponseDto> getCourse(@PathVariable Long id, @AuthenticationPrincipal UserEntity currentUser) {
+        return ResponseEntity.ok(courseService.getCourse(id, currentUser));
     }
 }
