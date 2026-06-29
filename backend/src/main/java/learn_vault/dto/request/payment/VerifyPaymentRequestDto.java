@@ -13,9 +13,10 @@ public class VerifyPaymentRequestDto {
 
     @NotNull(message = "Make a payment to access course.")
     private String razorpayOrderId;
+
     @NotNull(message = "Make a payment to access course.")
     private String signature;
 
-    @NotBlank(message = "Select a course")
+    @NotNull(message = "Select a course")
     private Long courseId;
 }

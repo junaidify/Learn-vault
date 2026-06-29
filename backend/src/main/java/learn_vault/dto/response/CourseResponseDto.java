@@ -22,17 +22,17 @@ public class CourseResponseDto {
     private final LocalDateTime updatedAt;
     private final String videoUrl;
 
-    public CourseResponseDto(CourseEntity course) {
+    public CourseResponseDto(CourseEntity course, boolean hasAccess) {
         this.id = course.getId();
         this.name = course.getName();
         this.description = course.getDescription();
         this.amount = course.getAmount();
-        this.category = getCategory();
+        this.category = course.getCategory();
         this.authorName = course.getAuthor().getUser().getName();
         this.published = course.getPublished();
         this.createdAt = course.getCreatedAt();
         this.updatedAt = course.getUpdatedAt();
-        this.videoUrl = course.getVideoKey();
+        this.videoUrl = hasAccess ? course.getVideoKey() : null;
     }
 
 }

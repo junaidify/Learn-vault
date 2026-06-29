@@ -18,7 +18,7 @@ public class CourseDto {
     @Positive(message = "Amount should always positive.")
     private Long amount;
 
-    @NotBlank(message = "Please specify the category")
+    @NotNull(message = "Please specify the category")
     private Category category;
 
     @NotNull

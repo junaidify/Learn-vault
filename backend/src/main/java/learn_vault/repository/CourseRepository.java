@@ -13,4 +13,5 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
     Page<CourseEntity> findAll(Pageable pageable);
     boolean existsById(Long id);
     void deletebyId(Long id);
+    boolean existsByUserIdAndCourseIdAndStatus(Long userId, Long courseId, String status);
 }
