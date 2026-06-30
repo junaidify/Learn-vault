@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -36,9 +37,12 @@ public class SecurityConfig {
                         .requestMatchers("api/v1/auth/**").permitAll()
                         .requestMatchers("api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("api/v1/author/**").hasAnyRole("ADMIN", "AUTHOR")
-                        // create-course must be matched before the wildcard /course/**
-                        .requestMatchers("api/v1/courses/create-course").hasAnyRole("ADMIN", "AUTHOR")
-                        .requestMatchers("api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR", "STUDENT")
+                        // Public read access — anyone can browse courses
+                        .requestMatchers(HttpMethod.GET, "api/v1/courses", "api/v1/courses/**").permitAll()
+                        // Write operations require AUTHOR or ADMIN
+                        .requestMatchers(HttpMethod.POST, "api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.PATCH, "api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.DELETE, "api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth -> oauth.successHandler(oauth2SuccessHandler))

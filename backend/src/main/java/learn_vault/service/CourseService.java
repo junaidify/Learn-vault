@@ -68,7 +68,7 @@ public class CourseService {
             throw new ResourceNotFoundException("Course not found with id " + id);
         }
 
-        courseRepository.deletebyId(id);
+        courseRepository.deleteById(id);
     }
 
     @Transactional
@@ -103,8 +103,8 @@ public class CourseService {
         CourseEntity course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course with ID " + id + " not found"));
 
-        boolean hasAccess = currentUser != null && courseRepository.existsByUserIdAndCourseIdAndStatus(
-             currentUser.getId(), id, EnrollmentStatus.ACTIVE.toString());
+        // TODO: Add proper enrollment-based access check
+        boolean hasAccess = false;
 
         return new CourseResponseDto(course, hasAccess);
     }
