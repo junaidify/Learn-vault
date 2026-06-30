@@ -14,6 +14,6 @@ public class CourseMapper {
           authorName = entity.getAuthor().getUser().getName();
       }
 
-      return new CourseResponseDto(entity);
+      return new CourseResponseDto(entity, false);
     }
 }

@@ -40,6 +40,8 @@ dependencies {
 	implementation 'software.amazon.awssdk:s3:2.25.6'
 	implementation 'software.amazon.awssdk:sts:2.25.6'
 
+	implementation 'net.datafaker:datafaker:2.4.2'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testCompileOnly 'org.projectlombok:lombok'

@@ -36,8 +36,9 @@ razorpay:
 
 aws:
   access:
-    key: ${AWS_ACCESS_KEY}
-    secret: ${AWS_SECRET_KEY}
-  region: ${AWS_REGION}
+    key: ${AWS_ACCESS_KEY:}
+  secret:
+    key: ${AWS_SECRET_KEY:}
+  region: ${AWS_REGION:ap-south-1}
   s3:
-    bucketName: ${AWS_BUCKETNAME}
+    bucketName: ${AWS_BUCKETNAME:}
