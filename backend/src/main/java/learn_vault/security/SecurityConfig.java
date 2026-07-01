@@ -43,6 +43,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
                         .requestMatchers(HttpMethod.PATCH, "api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
                         .requestMatchers(HttpMethod.DELETE, "api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
+                        // Payment endpoints — any authenticated user can pay
+                        .requestMatchers("/api/v1/payment/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth -> oauth.successHandler(oauth2SuccessHandler))
