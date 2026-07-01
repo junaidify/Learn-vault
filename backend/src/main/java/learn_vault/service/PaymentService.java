@@ -27,7 +27,7 @@ public class PaymentService {
     private final RazorpayClient razorpayClient;
     private final EnrollmentRepository enrollmentRepository;
 
-    @Value("${razorpay.key.secret")
+    @Value("${razorpay.key.secret}")
     private String razorpaySecretKey;
 
     public PaymentService(CourseRepository courseRepository, RazorpayClient razorpayClient,
@@ -74,7 +74,7 @@ public class PaymentService {
     public String verifyPayment(VerifyPaymentRequestDto dto, UserEntity currentUser)  {
 
         boolean isExist = enrollmentRepository
-                .existsByUser_IdOrCourse_Id(currentUser.getId(), dto.getCourseId());
+                .existsByUser_IdAndCourse_Id(currentUser.getId(), dto.getCourseId());
 
         if(isExist) return "You are already enrolled in this course!";
 
