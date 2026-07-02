@@ -2,9 +2,9 @@ spring:
   application:
     name: learn-vault
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/learn-vault}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/learnvault}
     username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    password: ${DB_PASSWORD:yourpassword}
   jpa:
     hibernate:
       ddl-auto: ${DDL_AUTO:update}

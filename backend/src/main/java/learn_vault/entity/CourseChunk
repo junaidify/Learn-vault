@@ -1,0 +1,22 @@
+
+@Entity
+@Table(name="course_chunk")
+@Getter @Setter
+public class CourseChunk{
+
+   @Id
+   @GeneratedValue(strategy=GenerationType.UUID)
+   private UUID id;
+
+   @Column(name="course_id", nullable=false)
+   private UUID courseId;
+
+   @Column(columnDefinition="TEXT", nullable=false)
+   private String content;
+
+   @Column(columnDefinition="vector(768)")
+   private String embedding;
+
+   private LocalDateTime createdAt = LocalDateTime.now();
+
+}
