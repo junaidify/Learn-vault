@@ -25,6 +25,7 @@ public class CourseEntity extends BaseEntity {
     private String name;
 
     @NotBlank(message = "Write something about course")
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Min(value = 0, message = "Price can't be negative. ")

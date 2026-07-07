@@ -1,17 +1,22 @@
+package learn_vault.service;
+
 import org.springframework.web.client.RestClient;
+import org.springframework.stereotype.Service;
+import org.springframework.http.MediaType;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmbeddingService{
     private final RestClient restClient;
-    private final RestClient RestClient;
 
     public EmbeddingService(){
-        this.restClient = RestClient.create("http://localhost:11434")
+        this.restClient = RestClient.create("http://localhost:11434");
     }
 
     public List<Double> embed(String text){
         Map<String, String> request = Map.of(
-                "modle", "nomed-embed-text",
+                "model", "nomic-embed-text",
                 "prompt", text
         );
 

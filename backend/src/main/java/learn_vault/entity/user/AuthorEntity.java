@@ -1,13 +1,9 @@
 package learn_vault.entity.user;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import learn_vault.entity.BaseEntity;
-import learn_vault.entity.course.CourseEntity;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @Table(name = "author")

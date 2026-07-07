@@ -39,11 +39,7 @@ public class UserService {
             throw new DuplicateResourceException("User already exists");
         }
 
-        Role role = dto.getRole() != null ? dto.getRole() : Role.STUDENT;
-
-        if(dto.getRole() == null){
-            throw new IllegalArgumentException("Role is required.");
-        }
+        Role role = dto.getRole();
 
         UserEntity newUser = new UserEntity(
                 dto.getName(),

@@ -3,8 +3,6 @@ package learn_vault.dto.response;
 import learn_vault.entity.course.CourseEntity;
 import learn_vault.enums.Category;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.Value;
 
 import java.time.LocalDateTime;
 
