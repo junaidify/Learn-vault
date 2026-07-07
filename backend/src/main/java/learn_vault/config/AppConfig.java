@@ -1,7 +1,6 @@
 package learn_vault.config;
 
 import learn_vault.service.CustomUserDetailsService;
-import org.aspectj.bridge.IProgressListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;

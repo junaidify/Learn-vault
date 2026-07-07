@@ -34,15 +34,15 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login/oauth2/code/**", "/oauth2/**").permitAll()
-                        .requestMatchers("api/v1/auth/**").permitAll()
-                        .requestMatchers("api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("api/v1/author/**").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/author/**").hasAnyRole("ADMIN", "AUTHOR")
                         // Public read access — anyone can browse courses
-                        .requestMatchers(HttpMethod.GET, "api/v1/courses", "api/v1/courses/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/courses", "/api/v1/courses/**").permitAll()
                         // Write operations require AUTHOR or ADMIN
-                        .requestMatchers(HttpMethod.POST, "api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
-                        .requestMatchers(HttpMethod.PATCH, "api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
-                        .requestMatchers(HttpMethod.DELETE, "api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/courses/**").hasAnyRole("ADMIN", "AUTHOR")
                         // Payment endpoints — any authenticated user can pay
                         .requestMatchers("/api/v1/payment/**").authenticated()
                         .anyRequest().authenticated()

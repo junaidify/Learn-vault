@@ -5,7 +5,6 @@ import learn_vault.entity.BaseEntity;
 import learn_vault.entity.course.CourseEntity;
 import learn_vault.entity.user.UserEntity;
 import learn_vault.enums.EnrollmentStatus;
-import learn_vault.enums.PaymentStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
