@@ -2,8 +2,10 @@ package learn_vault.service;
 
 import learn_vault.dto.request.LoginDto;
 import learn_vault.dto.request.SignupDto;
+import learn_vault.entity.user.AuthorEntity;
 import learn_vault.entity.user.UserEntity;
 import learn_vault.enums.Role;
+import learn_vault.exception.DuplicateResourceException;
 import learn_vault.repository.AuthorRepository;
 import learn_vault.repository.UserRepository;
 import learn_vault.security.JwtUtils;
@@ -30,8 +32,7 @@ class UserServiceTest {
     @Mock UserRepository userRepository;
     @Mock AuthorRepository authorRepository;
     @Mock PasswordEncoder passwordEncoder;
-    @Mock
-    JwtUtils jwtUtils;
+    @Mock JwtUtils jwtUtils;
 
     @InjectMocks UserService userService;
 
@@ -48,7 +49,7 @@ class UserServiceTest {
     }
 
     @Test
-    void signup_shouldReturnToken_whenNewUser() {
+    void signup_shouldReturnToken_whenNewStudentUser() {
         when(userRepository.existsByUsernameOrEmail(anyString(), anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("hashed");
         when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -58,6 +59,7 @@ class UserServiceTest {
 
         assertThat(token).isEqualTo("jwt-token");
         verify(userRepository).save(any(UserEntity.class));
+        verify(authorRepository, never()).save(any());
     }
 
     @Test
@@ -65,7 +67,7 @@ class UserServiceTest {
         when(userRepository.existsByUsernameOrEmail(anyString(), anyString())).thenReturn(true);
 
         assertThatThrownBy(() -> userService.userSignUp(signupDto))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(DuplicateResourceException.class)
                 .hasMessageContaining("already exists");
     }
 
@@ -76,20 +78,38 @@ class UserServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn("hashed");
         when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(jwtUtils.jwtGeneration(anyString())).thenReturn("jwt-token");
+        // The service calls findByEmail after save to get the persisted user for AuthorEntity
+        UserEntity savedUser = new UserEntity("Test User", "testuser1", "test@example.com", "hashed", Role.AUTHOR);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(savedUser));
 
         userService.userSignUp(signupDto);
 
-        verify(authorRepository).save(any());
+        verify(authorRepository).save(any(AuthorEntity.class));
     }
 
     @Test
-    void login_shouldReturnToken_onValidCredentials() {
+    void login_shouldReturnToken_onValidEmailCredentials() {
         UserEntity user = new UserEntity("Test", "testuser1", "test@example.com", "hashed", Role.STUDENT);
         LoginDto dto = new LoginDto();
         dto.setEmail("test@example.com");
         dto.setPassword("Password1");
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("Password1", "hashed")).thenReturn(true);
+        when(jwtUtils.jwtGeneration("test@example.com")).thenReturn("jwt-token");
+
+        String token = userService.userLogin(dto);
+        assertThat(token).isEqualTo("jwt-token");
+    }
+
+    @Test
+    void login_shouldReturnToken_onValidUsernameCredentials() {
+        UserEntity user = new UserEntity("Test", "testuser1", "test@example.com", "hashed", Role.STUDENT);
+        LoginDto dto = new LoginDto();
+        dto.setUsername("testuser1");
+        dto.setPassword("Password1");
+
+        when(userRepository.findByUsername("testuser1")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("Password1", "hashed")).thenReturn(true);
         when(jwtUtils.jwtGeneration("test@example.com")).thenReturn("jwt-token");
 
