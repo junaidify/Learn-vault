@@ -27,3 +27,17 @@ app:
 
 server:
   port: 0
+
+razorpay:
+  key:
+    id: test_key_id
+    secret: test_key_secret
+
+aws:
+  access:
+    key: test-access-key
+  secret:
+    key: test-secret-key
+  region: us-east-1
+  s3:
+    bucketName: test-bucket

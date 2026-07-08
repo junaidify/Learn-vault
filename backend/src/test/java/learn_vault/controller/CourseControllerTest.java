@@ -1,125 +1,162 @@
 package learn_vault.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import learn_vault.dto.request.CourseDto;
 import learn_vault.dto.response.CourseResponseDto;
-import learn_vault.entity.user.AuthorEntity;
 import learn_vault.entity.course.CourseEntity;
-import learn_vault.service.CourseService;
-import learn_vault.service.CustomUserDetailsService;
+import learn_vault.entity.user.AuthorEntity;
+import learn_vault.entity.user.UserEntity;
+import learn_vault.enums.Category;
+import learn_vault.enums.Role;
 import learn_vault.exception.GlobalExceptionHandler;
+import learn_vault.exception.ResourceNotFoundException;
 import learn_vault.security.JwtFilters;
 import learn_vault.security.JwtUtils;
+import learn_vault.security.Oauth2SuccessHandler;
+import learn_vault.security.SecurityConfig;
+import learn_vault.service.CourseService;
+import learn_vault.service.CustomUserDetailsService;
+import learn_vault.service.S3Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CourseController.class)
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, SecurityConfig.class, JwtFilters.class})
 class CourseControllerTest {
 
     @Autowired MockMvc mockMvc;
-    @Autowired ObjectMapper objectMapper;
 
-    @MockitoBean CourseService courseService;
-    @MockitoBean JwtUtils jwtUtils;
-    @MockitoBean JwtFilters jwtFilters;
-    @MockitoBean CustomUserDetailsService customUserDetailsService;
+    @MockBean CourseService courseService;
+    @MockBean S3Service s3Service;
+    @MockBean JwtUtils jwtUtils;
+    @MockBean CustomUserDetailsService customUserDetailsService;
+    @MockBean AuthenticationProvider authenticationProvider;
+    @MockBean Oauth2SuccessHandler oauth2SuccessHandler;
+
+    // ── Create Course (multipart) ────────────────────────────────────
 
     @Test
     @WithMockUser(roles = "AUTHOR")
     void createCourse_shouldReturn201_onSuccess() throws Exception {
-        when(courseService.courseCreate(any())).thenReturn(stubCourseResponse("Spring Boot"));
+        when(s3Service.uploadVideo(any())).thenReturn("videos/test-key.mp4");
+        when(courseService.courseCreate(any(), anyString())).thenReturn("Course created successfully.");
 
-        CourseDto dto = new CourseDto();
-        dto.setTitle("Spring Boot");
+        String courseJson = """
+                {
+                    "name": "Spring Boot",
+                    "description": "Learn Spring Boot",
+                    "amount": 999,
+                    "category": "TECH",
+                    "published": true,
+                    "videoUrl": "dummy",
+                    "author": "John Doe"
+                }
+                """;
 
-        mockMvc.perform(post("/course/create-course")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value("Spring Boot"))
-                .andExpect(jsonPath("$.authorName").value("Jane Author"));
-    }
+        MockMultipartFile dataPart = new MockMultipartFile(
+                "data", "", MediaType.APPLICATION_JSON_VALUE, courseJson.getBytes());
+        MockMultipartFile videoPart = new MockMultipartFile(
+                "video", "lecture.mp4", "video/mp4", "fake-video-bytes".getBytes());
 
-    @Test
-    @WithMockUser(roles = "AUTHOR")
-    void createCourse_shouldReturn409_whenDuplicate() throws Exception {
-        when(courseService.courseCreate(any()))
-                .thenThrow(new IllegalStateException("Course already exists under this author"));
-
-        CourseDto dto = new CourseDto();
-        dto.setTitle("Duplicate");
-
-        mockMvc.perform(post("/course/create-course")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isConflict());
-    }
-
-    @Test
-    @WithMockUser(roles = "AUTHOR")
-    void createCourse_shouldReturn400_whenTitleMissing() throws Exception {
-        CourseDto dto = new CourseDto();
-
-        mockMvc.perform(post("/course/create-course")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(multipart("/api/v1/courses/create-course")
+                        .file(dataPart)
+                        .file(videoPart)
+                        .with(csrf()))
+                .andExpect(status().isCreated());
     }
 
     @Test
     @WithMockUser(roles = "STUDENT")
-    void getCourses_shouldReturn200_withList() throws Exception {
-        when(courseService.getCourses()).thenReturn(List.of(stubCourseResponse("Course A")));
+    void createCourse_shouldReturn403_forStudent() throws Exception {
+        String courseJson = """
+                {"name":"Test","description":"Desc","amount":100,"category":"TECH","published":true,"videoUrl":"x","author":"A"}
+                """;
 
-        mockMvc.perform(get("/course"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Course A"));
+        MockMultipartFile dataPart = new MockMultipartFile(
+                "data", "", MediaType.APPLICATION_JSON_VALUE, courseJson.getBytes());
+        MockMultipartFile videoPart = new MockMultipartFile(
+                "video", "v.mp4", "video/mp4", "bytes".getBytes());
+
+        mockMvc.perform(multipart("/api/v1/courses/create-course")
+                        .file(dataPart)
+                        .file(videoPart)
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
     }
+
+    // ── Get Courses (paginated, public) ─────────────────────────────
+
+    @Test
+    @WithMockUser(roles = "STUDENT")
+    void getCourses_shouldReturn200_withPage() throws Exception {
+        UserEntity user = new UserEntity("Jane", "janedoe1", "jane@example.com", "hashed", Role.AUTHOR);
+        AuthorEntity author = new AuthorEntity(user);
+        CourseEntity c1 = new CourseEntity("Course A", "Desc", 100L,
+                Category.TECH, true, author, null);
+        CourseResponseDto dto = new CourseResponseDto(c1, false);
+        Page<CourseResponseDto> page = new PageImpl<>(List.of(dto), PageRequest.of(0, 10), 1);
+
+        when(courseService.getCourses(any())).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/courses")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Course A"));
+    }
+
+    // ── Get Single Course ───────────────────────────────────────────
 
     @Test
     @WithMockUser(roles = "STUDENT")
     void getCourse_shouldReturn200_whenFound() throws Exception {
-        when(courseService.getCourse(1L)).thenReturn(Optional.of(stubCourseResponse("Course A")));
+        UserEntity user = new UserEntity("Jane", "janedoe1", "jane@example.com", "hashed", Role.AUTHOR);
+        AuthorEntity author = new AuthorEntity(user);
+        CourseEntity course = new CourseEntity("Spring Boot", "Desc", 999L,
+                Category.TECH, true, author, null);
+        CourseResponseDto dto = new CourseResponseDto(course, false);
 
-        mockMvc.perform(get("/course/1"))
+        when(courseService.getCourse(eq(1L), any())).thenReturn(dto);
+
+        mockMvc.perform(get("/api/v1/courses/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Course A"));
+                .andExpect(jsonPath("$.name").value("Spring Boot"));
     }
 
     @Test
     @WithMockUser(roles = "STUDENT")
     void getCourse_shouldReturn404_whenNotFound() throws Exception {
-        when(courseService.getCourse(anyLong())).thenReturn(Optional.empty());
+        when(courseService.getCourse(eq(99L), any()))
+                .thenThrow(new ResourceNotFoundException("Course with ID 99 not found"));
 
-        mockMvc.perform(get("/course/99"))
+        mockMvc.perform(get("/api/v1/courses/99"))
                 .andExpect(status().isNotFound());
     }
 
-    private CourseResponseDto stubCourseResponse(String title) {
-        AuthorEntity author = new AuthorEntity("Jane Author");
-        CourseEntity course = new CourseEntity(title, author);
-        return new CourseResponseDto(course);
+    // ── Delete Course ───────────────────────────────────────────────
+
+    @Test
+    @WithMockUser(roles = "AUTHOR")
+    void deleteCourse_shouldReturn200_onSuccess() throws Exception {
+        mockMvc.perform(delete("/api/v1/courses/1").with(csrf()))
+                .andExpect(status().isOk());
     }
 }
