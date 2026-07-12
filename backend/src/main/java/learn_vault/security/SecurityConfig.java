@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/author/**").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers("/api/chat/**").permitAll()
                         // Public read access — anyone can browse courses
                         .requestMatchers(HttpMethod.GET, "/api/v1/courses", "/api/v1/courses/**").permitAll()
                         // Write operations require AUTHOR or ADMIN

@@ -1,7 +1,8 @@
-package learn_vault.service;
+package learn_vault.service.ragpipeline;
 
 import org.springframework.web.client.RestClient;
 import org.springframework.stereotype.Service;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +21,12 @@ public class EmbeddingService{
                 "prompt", text
         );
 
-        Map response = restClient.post()
+        Map<String, Object> response = restClient.post()
                 .uri("/api/embeddings")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
-                .body(Map.class);
+                .body(new ParameterizedTypeReference<Map<String, Object>>() {});
 
         return (List<Double>) response.get("embedding");
     }
