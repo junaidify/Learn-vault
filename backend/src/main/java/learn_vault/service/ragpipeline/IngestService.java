@@ -18,11 +18,11 @@ public class IngestService {
     public void ingestCourse(Long courseId) {
         Map<String, Object> course = jdbcClient.sql("""
                 SELECT id, name, description FROM courses
-                WHERE course_id = :courseId
+                WHERE id = :courseId
                 """)
-                .param(":courseId", courseId)
-                .query(Map.class)
-                .single();
+                .param("courseId", courseId)
+                .query()
+                .singleRow();
 
         String name = (String) course.get("name");
         String description = (String) course.get("description");
