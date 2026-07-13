@@ -19,8 +19,8 @@ public class LLMService {
         Map<String, Object> request = Map.of(
                 "model", "qwen3.5:4b",
                 "messages",  List.of(
-                        "role", "system", "content", systemPrompt,
-                        "role", "user", "content", userMessage
+                        Map.of("role", "system", "content", systemPrompt),
+                        Map.of("role", "user", "content", userMessage)
                 ),
                 "stream", false
         );

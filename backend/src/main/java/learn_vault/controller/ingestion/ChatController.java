@@ -1,7 +1,5 @@
-package learn_vault.controller;
+package learn_vault.controller.ingestion;
 import learn_vault.service.ragpipeline.ChatService;
-import learn_vault.service.ragpipeline.IngestService;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,11 +14,9 @@ import java.util.UUID;
 @RequestMapping("/api/chat")
 public class ChatController {
     private final ChatService chatService;
-    private final IngestService ingestService;
 
-    public ChatController(ChatService chatService, IngestService ingestService){
+    public ChatController(ChatService chatService){
         this.chatService = chatService;
-        this.ingestService = ingestService;
     }
 
     @PostMapping("/{courseId}")
@@ -39,15 +35,5 @@ public class ChatController {
         ));
     }
 
-    @PostMapping("/ingest/{courseId}")
-    public ResponseEntity<String> ingestCourse(@PathVariable Long courseId){
-        ingestService.ingestCourse(courseId);
-        return ResponseEntity.ok("Course ingested successfully");
-    }
-
-    @PostMapping("/ingest/courses/all")
-    public ResponseEntity<String> ingestAllCourse(){
-        ingestService.ingestAllCourses();
-        return ResponseEntity.ok("All courses ingested successfully");
-    }
+ 
 }

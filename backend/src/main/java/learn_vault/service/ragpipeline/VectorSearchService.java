@@ -17,7 +17,7 @@ public class VectorSearchService {
 
         return jdbcClient.sql("""
                 SELECT content FROM course_chunks
-                WHERE courseId = :courseId
+                WHERE course_id = :courseId
                 ORDER BY embedding <=> CAST(:embedding AS vector)
                 LIMIT 5;
                 """)
