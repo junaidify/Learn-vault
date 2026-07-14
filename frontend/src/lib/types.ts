@@ -97,3 +97,17 @@ export interface CourseQueryParams {
   sortBy?: SortBy;
   direction?: Direction;
 }
+
+// -------- Chat DTOs --------
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number; // local timestamp for rendering
+}
+
+export interface ChatResponse {
+  message: string;
+  conversationId: string;
+}
+

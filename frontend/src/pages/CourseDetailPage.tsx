@@ -1,9 +1,11 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useCourse } from '../api/courses';
 import { useCreateOrder, useVerifyPayment } from '../api/payment';
 import { useAuth } from '../context/AuthContext';
 import { openRazorpayCheckout, type RazorpayResponse } from '../lib/razorpay';
 import CategoryBadge from '../components/ui/CategoryBadge';
+import VideoPlayer from '../components/ui/VideoPlayer';
+import ChatPanel from '../components/ui/ChatPanel';
 import { useState } from 'react';
 
 export default function CourseDetailPage() {
@@ -14,10 +16,12 @@ export default function CourseDetailPage() {
   const createOrder = useCreateOrder();
   const verifyPayment = useVerifyPayment();
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [chatOpen, setChatOpen] = useState(false);
+  const location = useLocation();
 
   const handleEnroll = async () => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate('/login', { state: { from: location } });
       return;
     }
 
@@ -48,6 +52,8 @@ export default function CourseDetailPage() {
       onError: () => setPaymentStatus('error'),
     });
   };
+
+  const hasAccess = paymentStatus === 'success' || !!course?.videoUrl;
 
   // Loading
   if (isLoading) {
@@ -118,6 +124,13 @@ export default function CourseDetailPage() {
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Video Player — only visible when user has access */}
+            {hasAccess && course.videoUrl && (
+              <div className="animate-fade-in">
+                <VideoPlayer src={course.videoUrl} title={course.name} />
+              </div>
+            )}
+
             <div>
               <h2 className="mb-3 text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-surface-900)' }}>
                 About this course
@@ -135,6 +148,25 @@ export default function CourseDetailPage() {
               <InfoCard icon="📅" label="Published" value={formattedDate} />
               <InfoCard icon="✅" label="Status" value={course.published ? 'Published' : 'Draft'} />
             </div>
+
+            {/* AI Chat button — only visible when user has access */}
+            {hasAccess && (
+              <button
+                onClick={() => setChatOpen(true)}
+                className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-4 text-sm font-semibold transition-all hover:shadow-md"
+                style={{
+                  borderColor: 'var(--color-brand-200)',
+                  background: 'var(--color-brand-50)',
+                  color: 'var(--color-brand-700)',
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                💬 Ask the AI Assistant about this course
+              </button>
+            )}
           </div>
 
           {/* Sidebar — enrollment card */}
@@ -148,15 +180,28 @@ export default function CourseDetailPage() {
                 </span>
               </div>
 
-              {paymentStatus === 'success' ? (
-                <div className="rounded-xl p-4 text-center"
-                     style={{ background: '#ECFDF5' }}>
-                  <p className="text-sm font-semibold" style={{ color: 'var(--color-success)' }}>
-                    🎉 Enrolled successfully!
-                  </p>
-                  <p className="mt-1 text-xs" style={{ color: 'var(--color-surface-800)', opacity: 0.6 }}>
-                    You now have access to this course.
-                  </p>
+              {paymentStatus === 'success' || hasAccess ? (
+                <div className="space-y-3">
+                  <div className="rounded-xl p-4 text-center"
+                       style={{ background: '#ECFDF5' }}>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--color-success)' }}>
+                      🎉 Enrolled successfully!
+                    </p>
+                    <p className="mt-1 text-xs" style={{ color: 'var(--color-surface-800)', opacity: 0.6 }}>
+                      You now have access to this course.
+                    </p>
+                  </div>
+                  {/* Quick action — open chat */}
+                  <button
+                    onClick={() => setChatOpen(true)}
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-none py-2.5 text-sm font-medium transition-all hover:shadow-sm"
+                    style={{ background: 'var(--color-brand-50)', color: 'var(--color-brand-700)' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Ask AI Assistant
+                  </button>
                 </div>
               ) : (
                 <>
@@ -188,6 +233,10 @@ export default function CourseDetailPage() {
                 </li>
                 <li className="flex items-center gap-2 text-xs" style={{ color: 'var(--color-surface-800)', opacity: 0.6 }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  AI-powered Q&A assistant
+                </li>
+                <li className="flex items-center gap-2 text-xs" style={{ color: 'var(--color-surface-800)', opacity: 0.6 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
                   Certificate of completion
                 </li>
               </ul>
@@ -195,6 +244,15 @@ export default function CourseDetailPage() {
           </div>
         </div>
       </section>
+
+      {/* Chat Panel — slides in from right */}
+      {chatOpen && (
+        <ChatPanel
+          courseId={Number(id)}
+          courseName={course.name}
+          onClose={() => setChatOpen(false)}
+        />
+      )}
     </div>
   );
 }

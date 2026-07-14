@@ -2,6 +2,7 @@ package learn_vault.service;
 
 import learn_vault.dto.request.CourseDto;
 import learn_vault.dto.response.CourseResponseDto;
+import java.util.List;
 import learn_vault.entity.user.AuthorEntity;
 import learn_vault.entity.course.CourseEntity;
 import learn_vault.entity.user.UserEntity;
@@ -13,6 +14,7 @@ import learn_vault.mapper.CourseMapper;
 import learn_vault.repository.AuthorRepository;
 import learn_vault.repository.CourseRepository;
 import learn_vault.repository.UserRepository;
+import learn_vault.repository.EnrollmentRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,14 +28,17 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final AuthorRepository authorRepository;
     private final UserRepository userRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final CourseMapper courseMapper;
     private final S3Service s3Service;
 
-    public CourseService(CourseRepository courseRepository,AuthorRepository authorRepository,
-                         UserRepository userRepository,CourseMapper courseMapper, S3Service s3Service) {
+    public CourseService(CourseRepository courseRepository, AuthorRepository authorRepository,
+                         UserRepository userRepository, EnrollmentRepository enrollmentRepository,
+                         CourseMapper courseMapper, S3Service s3Service) {
         this.courseRepository = courseRepository;
         this.authorRepository = authorRepository;
         this.userRepository = userRepository;
+        this.enrollmentRepository = enrollmentRepository;
         this.courseMapper = courseMapper;
         this.s3Service = s3Service;
     }
@@ -103,9 +108,46 @@ public class CourseService {
         CourseEntity course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course with ID " + id + " not found"));
 
-        // TODO: Add proper enrollment-based access check
         boolean hasAccess = false;
+        if (course.getAmount() == 0) {
+            hasAccess = true;
+        } else if (currentUser != null) {
+            if (currentUser.getRole() == Role.ADMIN) {
+                hasAccess = true;
+            } else if (currentUser.getRole() == Role.AUTHOR) {
+                hasAccess = (course.getAuthor() != null && course.getAuthor().getUser() != null &&
+                             course.getAuthor().getUser().getId().equals(currentUser.getId()));
+            } else {
+                hasAccess = enrollmentRepository.existsByUser_IdAndCourse_Id(currentUser.getId(), id);
+            }
+        }
 
         return new CourseResponseDto(course, hasAccess);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CourseResponseDto> getEnrolledCourses(UserEntity currentUser) {
+        if (currentUser == null) {
+            throw new ResourceNotFoundException("User not authenticated");
+        }
+        return enrollmentRepository.findByUser_IdAndEnrollmentStatus(currentUser.getId(), EnrollmentStatus.ACTIVE)
+                .stream()
+                .map(enrollment -> new CourseResponseDto(enrollment.getCourse(), true))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CourseResponseDto> getAuthorCourses(UserEntity currentUser) {
+        if (currentUser == null) {
+            throw new ResourceNotFoundException("User not authenticated");
+        }
+        AuthorEntity author = authorRepository.findByUserId(currentUser.getId());
+        if (author == null) {
+            throw new ResourceNotFoundException("Author not found");
+        }
+        return courseRepository.findByAuthor_Id(author.getId())
+                .stream()
+                .map(course -> new CourseResponseDto(course, true))
+                .toList();
     }
 }
