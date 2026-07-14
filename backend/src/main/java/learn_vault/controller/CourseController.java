@@ -79,4 +79,15 @@ public class CourseController {
     public ResponseEntity<CourseResponseDto> getCourse(@PathVariable Long id, @AuthenticationPrincipal UserEntity currentUser) {
         return ResponseEntity.ok(courseService.getCourse(id, currentUser));
     }
+
+    @GetMapping("/enrolled")
+    public ResponseEntity<List<CourseResponseDto>> getEnrolledCourses(@AuthenticationPrincipal UserEntity currentUser) {
+        return ResponseEntity.ok(courseService.getEnrolledCourses(currentUser));
+    }
+
+    @GetMapping("/author")
+    @PreAuthorize("hasRole('AUTHOR')")
+    public ResponseEntity<List<CourseResponseDto>> getAuthorCourses(@AuthenticationPrincipal UserEntity currentUser) {
+        return ResponseEntity.ok(courseService.getAuthorCourses(currentUser));
+    }
 }

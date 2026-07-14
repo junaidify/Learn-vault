@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return User.builder()
                 .username(user.getEmail())
-                .password(user.getPassword())
+                .password(user.getPassword() != null ? user.getPassword() : "OAUTH2_USER")
                 .roles(user.getRole().name())
                 .build();
     }

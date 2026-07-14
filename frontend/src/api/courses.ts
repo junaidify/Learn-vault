@@ -26,6 +26,28 @@ export function useCourses(params: CourseQueryParams = {}) {
   });
 }
 
+/** GET /api/v1/courses/enrolled — user's enrolled courses */
+export function useEnrolledCourses() {
+  return useQuery<CourseResponseDto[]>({
+    queryKey: ['courses', 'enrolled'],
+    queryFn: async () => {
+      const res = await api.get<CourseResponseDto[]>('/api/v1/courses/enrolled');
+      return res.data;
+    },
+  });
+}
+
+/** GET /api/v1/courses/author — author's courses */
+export function useAuthorCourses() {
+  return useQuery<CourseResponseDto[]>({
+    queryKey: ['courses', 'author'],
+    queryFn: async () => {
+      const res = await api.get<CourseResponseDto[]>('/api/v1/courses/author');
+      return res.data;
+    },
+  });
+}
+
 /** GET /api/v1/courses/:id — single course */
 export function useCourse(id: number | string) {
   return useQuery<CourseResponseDto>({

@@ -45,14 +45,7 @@ export type SignupFormValues = z.infer<typeof signupSchema>;
 export const loginSchema = z.object({
   identifier: z.string().min(1, 'Enter your email or username.'),
 
-  password: z
-    .string()
-    .min(8, 'Password must be between 8-20 characters.')
-    .max(20, 'Password must be between 8-20 characters.')
-    .regex(
-      /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).*$/,
-      'Password must contain at least one digit, one lowercase and one uppercase letter.'
-    ),
+  password: z.string().min(1, 'Password is required.'),
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
