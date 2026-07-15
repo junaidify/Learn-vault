@@ -41,7 +41,10 @@ public class ChatService {
         String context = String.join("\n", chunks);
         String chatHistory = String.join("\n", history);
 
-        String systemPrompt = "You are a helpful course assistant. Answer only using the context provided. If the answer is not in the context, say you don't know.";
+        String systemPrompt = """
+                You are a helpful course assistant. Answer the user's question about the course.
+                Prefer using the provided context to answer. If the context contains placeholder/lorem-ipsum text or does not directly answer the question, use your general knowledge of the course topic (indicated by the course name in the context) to provide a friendly, educational, and comprehensive response.
+                """;
 
         String userPrompt = """
                 CONTEXT:

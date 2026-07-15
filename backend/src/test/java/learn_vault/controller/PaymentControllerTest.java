@@ -85,6 +85,6 @@ class PaymentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Course purchased successfully"));
+                .andExpect(jsonPath("$.message").value("Course purchased successfully"));
     }
 }

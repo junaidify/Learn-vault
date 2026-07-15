@@ -55,4 +55,9 @@ public class UserEntity extends BaseEntity {
     public void setEmail(String email){ this.email = email; }
     public void setPassword(String hashedPassword){ this.password = hashedPassword; }
     public void setRole(Role role){ this.role = role; }
+
+    @Override
+    public String toString() {
+        return email;
+    }
 }

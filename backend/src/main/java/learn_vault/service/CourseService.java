@@ -104,6 +104,21 @@ public class CourseService {
     }
 
     @Transactional(readOnly = true)
+    public Page<CourseResponseDto> getCourses(learn_vault.enums.Category category, String search, Pageable pageable) {
+        Page<CourseEntity> coursePage;
+        if (category == null && search == null) {
+            coursePage = courseRepository.findAll(pageable);
+        } else if (category != null && search == null) {
+            coursePage = courseRepository.findByCategory(category, pageable);
+        } else if (category == null && search != null) {
+            coursePage = courseRepository.findBySearch(search, pageable);
+        } else {
+            coursePage = courseRepository.findByCategoryAndSearch(category, search, pageable);
+        }
+        return coursePage.map(courseMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
     public CourseResponseDto getCourse(Long id, UserEntity currentUser) {
         CourseEntity course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course with ID " + id + " not found"));

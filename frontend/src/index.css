@@ -5,17 +5,17 @@
    ========================================= */
 
 @theme {
-  /* Brand colors */
-  --color-brand-50: #EEF2FF;
-  --color-brand-100: #E0E7FF;
-  --color-brand-200: #C7D2FE;
-  --color-brand-300: #A5B4FC;
-  --color-brand-400: #818CF8;
-  --color-brand-500: #6366F1;
-  --color-brand-600: #4F46E5;
-  --color-brand-700: #4338CA;
-  --color-brand-800: #3730A3;
-  --color-brand-900: #312E81;
+  /* Brand colors (Tutorly Black/Slate theme) */
+  --color-brand-50: #F8FAFC;
+  --color-brand-100: #F1F5F9;
+  --color-brand-200: #E2E8F0;
+  --color-brand-300: #CBD5E1;
+  --color-brand-400: #94A3B8;
+  --color-brand-500: #475569;
+  --color-brand-600: #0F172A;
+  --color-brand-700: #020617;
+  --color-brand-800: #000000;
+  --color-brand-900: #000000;
 
   /* Surface / background colors */
   --color-surface-0: #FFFFFF;

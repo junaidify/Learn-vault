@@ -96,6 +96,8 @@ export interface CourseQueryParams {
   size?: number;
   sortBy?: SortBy;
   direction?: Direction;
+  category?: Category;
+  search?: string;
 }
 
 // -------- Chat DTOs --------
