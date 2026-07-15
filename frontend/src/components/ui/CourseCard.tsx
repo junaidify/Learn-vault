@@ -5,17 +5,19 @@ import type { CourseResponseDto, Category } from '../../lib/types';
 interface Props {
   course: CourseResponseDto;
   index?: number;
+  isWishlisted?: boolean;
+  onWishlistToggle?: (courseId: number, e: React.MouseEvent) => void;
 }
 
 /* Category → gradient + icon config for the thumbnail area */
 const THUMB_CONFIG: Record<Category, { gradient: string; emoji: string }> = {
-  TECH:          { gradient: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #A78BFA 100%)', emoji: '💻' },
-  COMMUNICATION: { gradient: 'linear-gradient(135deg, #F59E0B 0%, #F97316 50%, #FB923C 100%)', emoji: '🎤' },
-  PSYCHOLOGY:    { gradient: 'linear-gradient(135deg, #EC4899 0%, #F472B6 50%, #F9A8D4 100%)', emoji: '🧠' },
-  LANGUAGE:      { gradient: 'linear-gradient(135deg, #10B981 0%, #34D399 50%, #6EE7B7 100%)', emoji: '🌍' },
+  TECH:          { gradient: 'linear-gradient(135deg, #1E293B 0%, #475569 100%)', emoji: '💻' },
+  COMMUNICATION: { gradient: 'linear-gradient(135deg, #334155 0%, #1E293B 100%)', emoji: '🎤' },
+  PSYCHOLOGY:    { gradient: 'linear-gradient(135deg, #475569 0%, #334155 100%)', emoji: '🧠' },
+  LANGUAGE:      { gradient: 'linear-gradient(135deg, #1E293B 0%, #64748B 100%)', emoji: '🌍' },
 };
 
-export default function CourseCard({ course, index = 0 }: Props) {
+export default function CourseCard({ course, index = 0, isWishlisted = false, onWishlistToggle }: Props) {
   const delay = `stagger-${Math.min(index + 1, 6)}`;
   const thumb = THUMB_CONFIG[course.category] ?? THUMB_CONFIG.TECH;
 
@@ -80,7 +82,7 @@ export default function CourseCard({ course, index = 0 }: Props) {
               boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
             }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="var(--color-brand-600)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="black">
               <path d="M8 5.14v14l11-7-11-7z" />
             </svg>
           </div>
@@ -91,7 +93,7 @@ export default function CourseCard({ course, index = 0 }: Props) {
           className="absolute right-3 top-3 rounded-full px-3 py-1 text-sm font-bold"
           style={{
             background: 'rgba(255,255,255,0.95)',
-            color: 'var(--color-brand-700)',
+            color: 'black',
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
             fontFamily: 'var(--font-heading)',
           }}
@@ -103,6 +105,28 @@ export default function CourseCard({ course, index = 0 }: Props) {
         <div className="absolute left-3 top-3">
           <CategoryBadge category={course.category} />
         </div>
+
+        {/* Wishlist button */}
+        {onWishlistToggle && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onWishlistToggle(course.id, e);
+            }}
+            className="absolute right-3 bottom-3 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-none transition-all hover:scale-110"
+            style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              color: isWishlisted ? 'var(--color-error)' : 'var(--color-surface-800)',
+            }}
+            title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={isWishlisted ? 'var(--color-error)' : 'none'} stroke="currentColor" strokeWidth="2.5">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Card body */}

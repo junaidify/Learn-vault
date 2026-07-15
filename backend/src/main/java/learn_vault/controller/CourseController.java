@@ -64,15 +64,27 @@ public class CourseController {
     public ResponseEntity<Page<CourseResponseDto>> getCourses(@RequestParam(defaultValue = "0") @Min(0) int page,
                                                               @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
                                                               @RequestParam(defaultValue = "createdAt") String sortBy,
-                                                              @RequestParam(defaultValue = "DESC") String direction) {
-        String safeSortBy = ALLOWED_SORT_FIELDS.contains(sortBy) ? sortBy : "createdAt";
+                                                              @RequestParam(defaultValue = "DESC") String direction,
+                                                              @RequestParam(required = false) learn_vault.enums.Category category,
+                                                              @RequestParam(required = false) String search) {
+        String dbSortField;
+        if ("price".equals(sortBy)) {
+            dbSortField = "amount";
+        } else if ("title".equals(sortBy)) {
+            dbSortField = "name";
+        } else {
+            dbSortField = ALLOWED_SORT_FIELDS.contains(sortBy) ? sortBy : "createdAt";
+        }
 
         Sort sort = direction.equalsIgnoreCase("ASC") ?
-                Sort.by(safeSortBy).ascending() : Sort.by(safeSortBy).descending();
+                Sort.by(dbSortField).ascending() : Sort.by(dbSortField).descending();
 
         int safeSize = Math.min(size, 100);
         Pageable pageable = PageRequest.of(page, safeSize, sort);
-        return ResponseEntity.ok(courseService.getCourses(pageable));
+
+        String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
+
+        return ResponseEntity.ok(courseService.getCourses(category, searchParam, pageable));
     }
 
     @GetMapping("/{id}")
@@ -90,4 +102,5 @@ public class CourseController {
     public ResponseEntity<List<CourseResponseDto>> getAuthorCourses(@AuthenticationPrincipal UserEntity currentUser) {
         return ResponseEntity.ok(courseService.getAuthorCourses(currentUser));
     }
+
 }

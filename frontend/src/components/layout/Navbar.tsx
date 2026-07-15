@@ -46,22 +46,22 @@ export default function Navbar() {
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 no-underline">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl"
-               style={{ background: 'linear-gradient(135deg, var(--color-brand-600), var(--color-brand-400))' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"
-                 strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
           </div>
-          <span className="text-xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-surface-900)' }}>
-            Learn<span style={{ color: 'var(--color-brand-600)' }}>Vault</span>
+          <span className="text-xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-heading)', color: '#000000' }}>
+            tutorly<span className="text-gray-400">.</span>
           </span>
         </Link>
 
         {/* Desktop Nav */}
         <div className="hidden items-center gap-1 md:flex">
-          <NavLink to="/" active={isActive('/')}>Courses</NavLink>
+          <NavLink to="/" active={isActive('/')}>Home</NavLink>
+          <a href="/#about" className="rounded-lg px-3 py-2 text-sm font-medium no-underline transition-colors hover:bg-gray-100" style={{ color: 'var(--color-surface-800)' }}>About Us</a>
+          <NavLink to="/" active={false}>Courses</NavLink>
+          <a href="#" className="rounded-lg px-3 py-2 text-sm font-medium no-underline transition-colors hover:bg-gray-100" style={{ color: 'var(--color-surface-800)' }}>Blog</a>
 
           {isAuthenticated && user?.role === 'STUDENT' && (
             <NavLink to="/dashboard" active={isActive('/dashboard')}>Dashboard</NavLink>
@@ -84,8 +84,7 @@ export default function Navbar() {
                 className="flex cursor-pointer items-center gap-2 rounded-full border-none px-3 py-1.5 transition-all hover:shadow-sm"
                 style={{ background: 'var(--color-brand-50)', color: 'var(--color-brand-700)' }}
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white"
-                     style={{ background: 'linear-gradient(135deg, var(--color-brand-600), var(--color-brand-400))' }}>
+                <div className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white bg-black">
                   {user!.name.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-sm font-medium">{user!.name}</span>
@@ -104,8 +103,7 @@ export default function Navbar() {
                     <p className="text-sm font-semibold" style={{ color: 'var(--color-surface-900)' }}>
                       {user!.name}
                     </p>
-                    <span className="mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                          style={{ background: 'var(--color-brand-100)', color: 'var(--color-brand-700)' }}>
+                    <span className="mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold bg-black text-white">
                       {user!.role}
                     </span>
                   </div>
@@ -161,15 +159,18 @@ export default function Navbar() {
             <>
               <Link to="/login"
               state={{from: location}}
-                    className="rounded-lg px-4 py-2 text-sm font-medium no-underline transition-colors"
+                    className="rounded-lg px-4 py-2 text-sm font-medium no-underline transition-colors hover:bg-gray-100"
                     style={{ color: 'var(--color-surface-800)' }}>
                 Log in
               </Link>
               <Link to="/signup"
-              state={{from: location}}
-                    className="rounded-lg px-5 py-2 text-sm font-semibold text-white no-underline shadow-sm transition-all hover:shadow-md"
-                    style={{ background: 'linear-gradient(135deg, var(--color-brand-600), var(--color-brand-500))', borderRadius: 'var(--radius-btn)' }}>
-                Sign up free
+                    state={{from: location}}
+                    className="inline-flex items-center gap-2 rounded-full bg-black py-2 pl-5 pr-2.5 text-sm font-semibold text-white no-underline shadow-sm transition-all hover:bg-slate-900"
+                    style={{ borderRadius: '9999px' }}>
+                <span>SIGN UP</span>
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-black text-[10px] font-bold">
+                  →
+                </span>
               </Link>
             </>
           )}

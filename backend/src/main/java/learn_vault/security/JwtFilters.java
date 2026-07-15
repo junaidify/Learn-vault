@@ -6,25 +6,27 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import learn_vault.service.CustomUserDetailsService;
+import learn_vault.entity.user.UserEntity;
+import learn_vault.repository.UserRepository;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtFilters extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
-    private final CustomUserDetailsService customUserDetailsService;
+    private final UserRepository userRepository;
 
-    public JwtFilters(JwtUtils jwtUtils, CustomUserDetailsService customUserDetailsService) {
+    public JwtFilters(JwtUtils jwtUtils, UserRepository userRepository) {
         this.jwtUtils = jwtUtils;
-        this.customUserDetailsService = customUserDetailsService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -42,16 +44,18 @@ public class JwtFilters extends OncePerRequestFilter {
             String email = jwtUtils.extractEmail(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
+                if (userEntity != null) {
+                    List<SimpleGrantedAuthority> authorities = List.of(
+                            new SimpleGrantedAuthority("ROLE_" + userEntity.getRole().name())
+                    );
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userEntity, null, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
         } catch (JwtException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write("{\"error\":\"Invalid or expired token\"}");
-            return;
+            // Token is expired or invalid; ignore and let Spring Security reject protected endpoints
         }
 
         filterChain.doFilter(request, response);

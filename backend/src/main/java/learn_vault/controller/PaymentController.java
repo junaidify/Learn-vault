@@ -25,9 +25,10 @@ public class PaymentController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<String> verifyPayment(@Valid @RequestBody VerifyPaymentRequestDto dto,
-                                                @AuthenticationPrincipal UserEntity currentUser){
-        return ResponseEntity.ok(paymentService.verifyPayment(dto, currentUser));
+    public ResponseEntity<java.util.Map<String, String>> verifyPayment(@Valid @RequestBody VerifyPaymentRequestDto dto,
+                                                                       @AuthenticationPrincipal UserEntity currentUser){
+        String message = paymentService.verifyPayment(dto, currentUser);
+        return ResponseEntity.ok(java.util.Map.of("message", message));
     }
 
 

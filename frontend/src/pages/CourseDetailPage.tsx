@@ -1,23 +1,27 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCourse } from '../api/courses';
 import { useCreateOrder, useVerifyPayment } from '../api/payment';
 import { useAuth } from '../context/AuthContext';
 import { openRazorpayCheckout, type RazorpayResponse } from '../lib/razorpay';
 import CategoryBadge from '../components/ui/CategoryBadge';
 import VideoPlayer from '../components/ui/VideoPlayer';
-import ChatPanel from '../components/ui/ChatPanel';
 import { useState } from 'react';
 
 export default function CourseDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, isAuthenticated } = useAuth();
   const { data: course, isLoading, isError } = useCourse(id!);
   const createOrder = useCreateOrder();
   const verifyPayment = useVerifyPayment();
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
-  const [chatOpen, setChatOpen] = useState(false);
   const location = useLocation();
+
+  const handleOpenGlobalChat = () => {
+    window.dispatchEvent(new CustomEvent('open-global-chat'));
+  };
 
   const handleEnroll = async () => {
     if (!isAuthenticated) {
@@ -40,7 +44,12 @@ export default function CourseDetailPage() {
                 courseId: Number(id),
               },
               {
-                onSuccess: () => setPaymentStatus('success'),
+                onSuccess: () => {
+                  setPaymentStatus('success');
+                  // Invalidate queries so that the course details page immediately gets access
+                  queryClient.invalidateQueries({ queryKey: ['course'] });
+                  queryClient.invalidateQueries({ queryKey: ['courses'] });
+                },
                 onError: () => setPaymentStatus('error'),
               },
             );
@@ -149,24 +158,22 @@ export default function CourseDetailPage() {
               <InfoCard icon="✅" label="Status" value={course.published ? 'Published' : 'Draft'} />
             </div>
 
-            {/* AI Chat button — only visible when user has access */}
-            {hasAccess && (
-              <button
-                onClick={() => setChatOpen(true)}
-                className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-4 text-sm font-semibold transition-all hover:shadow-md"
-                style={{
-                  borderColor: 'var(--color-brand-200)',
-                  background: 'var(--color-brand-50)',
-                  color: 'var(--color-brand-700)',
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                     strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-                💬 Ask the AI Assistant about this course
-              </button>
-            )}
+            {/* AI Chat button — always visible to allow interaction */}
+            <button
+              onClick={handleOpenGlobalChat}
+              className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-4 text-sm font-semibold transition-all hover:shadow-md"
+              style={{
+                borderColor: 'var(--color-brand-200)',
+                background: 'var(--color-brand-50)',
+                color: 'var(--color-brand-700)',
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                   strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              💬 Ask the AI Assistant about this course
+            </button>
           </div>
 
           {/* Sidebar — enrollment card */}
@@ -193,7 +200,7 @@ export default function CourseDetailPage() {
                   </div>
                   {/* Quick action — open chat */}
                   <button
-                    onClick={() => setChatOpen(true)}
+                    onClick={handleOpenGlobalChat}
                     className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-none py-2.5 text-sm font-medium transition-all hover:shadow-sm"
                     style={{ background: 'var(--color-brand-50)', color: 'var(--color-brand-700)' }}
                   >
@@ -204,7 +211,7 @@ export default function CourseDetailPage() {
                   </button>
                 </div>
               ) : (
-                <>
+                <div className="space-y-3">
                   <button
                     onClick={handleEnroll}
                     disabled={paymentStatus === 'processing'}
@@ -214,12 +221,23 @@ export default function CourseDetailPage() {
                     {paymentStatus === 'processing' ? 'Processing…' : `Enroll & Pay ₹${course.amount.toLocaleString('en-IN')}`}
                   </button>
 
+                  <button
+                    onClick={handleOpenGlobalChat}
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed py-2.5 text-sm font-medium transition-all hover:bg-gray-50"
+                    style={{ borderColor: 'var(--color-brand-200)', color: 'var(--color-brand-700)', background: 'transparent' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Ask AI Assistant (Free Demo)
+                  </button>
+
                   {paymentStatus === 'error' && (
                     <p className="mt-3 text-center text-xs font-medium" style={{ color: 'var(--color-error)' }}>
                       Payment failed. Please try again.
                     </p>
                   )}
-                </>
+                </div>
               )}
 
               <ul className="mt-5 list-none space-y-2 p-0">
@@ -245,14 +263,6 @@ export default function CourseDetailPage() {
         </div>
       </section>
 
-      {/* Chat Panel — slides in from right */}
-      {chatOpen && (
-        <ChatPanel
-          courseId={Number(id)}
-          courseName={course.name}
-          onClose={() => setChatOpen(false)}
-        />
-      )}
     </div>
   );
 }
