@@ -9,17 +9,17 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:8001',
+        target: 'https://learn-vault-1.onrender.com',
         changeOrigin: true,
         secure: false,
       },
       '/oauth2': {
-        target: 'http://localhost:8001',
+        target: 'https://learn-vault-1.onrender.com',
         changeOrigin: true, 
         secure: false
       }, 
       '/login/oauth2': {
-        target: 'http://localhost:8001', 
+        target: 'https://learn-vault-1.onrender.com', 
         changeOrigin: true, 
         secure: false
       }
