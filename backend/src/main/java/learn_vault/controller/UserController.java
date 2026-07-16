@@ -1,6 +1,7 @@
 package learn_vault.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import learn_vault.dto.request.SignupDto;
 import learn_vault.service.UserService;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
+    @Value("${app.cookie-secure:false}")
+    private boolean cookieSecure;
+
     public UserController(UserService userService){
         this.userService = userService;
     }
@@ -24,6 +28,8 @@ public class UserController {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(60 * 60 * 48)
+                .sameSite(cookieSecure ? "None" : "Lax")
+                .secure(cookieSecure)
                 .build();
 
         return ResponseEntity.ok()
