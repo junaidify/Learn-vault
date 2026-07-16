@@ -65,7 +65,7 @@ public class AppConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("http://localhost:5173", "https://learn-vault-six.vercel.app", "https://learn-vault-*.vercel.app", "https://*.vercel.app"));
+        config.setAllowedOriginPatterns(List.of("http://localhost:5173", "https://learn-vault-six.vercel.app", "https://learn-vault-*.vercel.app"));
         config.setAllowedMethods(List.of("GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
