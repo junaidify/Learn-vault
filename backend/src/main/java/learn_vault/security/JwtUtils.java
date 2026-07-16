@@ -24,6 +24,7 @@ public class JwtUtils {
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 48))
                 .signWith(SECRET_KEY)
                 .compact();
+            
     }
 
     public String extractEmail(String token) {

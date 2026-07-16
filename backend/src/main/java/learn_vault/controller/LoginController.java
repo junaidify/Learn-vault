@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
     private final UserService userService;
     private final UserRepository userRepository;
+    private boolean cookieSecure; 
 
     public LoginController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
@@ -37,6 +38,8 @@ public class LoginController {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(60 * 60 * 48)
+                .sameSite(cookieSecure ? "None" : "Lax")
+                .secure(cookieSecure)
                 .build();
 
         return ResponseEntity.ok()
@@ -50,6 +53,8 @@ public class LoginController {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(0)
+                .sameSite(cookieSecure ? "None" : "Lax")
+                .secure(cookieSecure)
                 .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
