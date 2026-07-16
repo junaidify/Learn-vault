@@ -7,6 +7,7 @@ import learn_vault.entity.user.UserEntity;
 import learn_vault.enums.Role;
 import learn_vault.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -47,14 +48,15 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String token = jwtUtils.jwtGeneration(email);
 
-        Cookie cookie = new Cookie("jwt", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(cookieSecure);
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 48); 
-        cookie.setSecure(true);
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from("jwt", token)
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .path("/")
+                .maxAge(60 * 60 * 48)
+                .sameSite(cookieSecure ? "None" : "Lax")
+                .build();
 
+        response.addHeader("Set-Cookie", cookie.toString());
         response.sendRedirect(redirectUrl);
     }
 }
