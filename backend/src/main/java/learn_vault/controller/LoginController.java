@@ -1,6 +1,7 @@
 package learn_vault.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import learn_vault.dto.request.LoginDto;
 import learn_vault.service.UserService;
 import learn_vault.repository.UserRepository;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
     private final UserService userService;
     private final UserRepository userRepository;
+
+    @Value("${app.cookie-secure:false}")
     private boolean cookieSecure; 
 
     public LoginController(UserService userService, UserRepository userRepository) {
