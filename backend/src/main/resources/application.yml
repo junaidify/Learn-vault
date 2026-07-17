@@ -17,6 +17,7 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID:dummy}
             client-secret: ${GOOGLE_CLIENT_SECRET:dummy}
             scope: email, profile
+            redirect-uri: ${OAUTH2_CLIENT_REDIRECT_URI:https://learn-vault-six.vercel.app/login/oauth2/code/google}
 
 server:
   port: ${SERVER_PORT:8080}
