@@ -2,9 +2,6 @@ import { useMutation } from '@tanstack/react-query';
 import api from './axios';
 import type { CourseAmountResponseDto, VerifyPaymentRequest } from '../lib/types';
 
-/* =========================================
-   Payment API hooks
-   ========================================= */
 
 /** POST /api/v1/payment/order/{courseId} — create Razorpay order */
 export function useCreateOrder() {
