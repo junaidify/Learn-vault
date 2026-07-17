@@ -14,7 +14,7 @@ public class LLMService {
     private final RestClient restClient;
     private final String model;
 
-    public LLMService(@Value("${GROQ_API_KEY}") String apiKey) {
+    public LLMService(@Value("${GROQ_API_KEY:dummy}") String apiKey) {
         this.restClient = RestClient.builder()
                 .baseUrl("https://api.groq.com/openai/v1")
                 .defaultHeader("Authorization", "Bearer " + apiKey)

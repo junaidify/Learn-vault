@@ -131,7 +131,7 @@ public class CourseService {
                 hasAccess = true;
             } else if (currentUser.getRole() == Role.AUTHOR) {
                 hasAccess = (course.getAuthor() != null && course.getAuthor().getUser() != null &&
-                             course.getAuthor().getUser().getId().equals(currentUser.getId()));
+                             java.util.Objects.equals(course.getAuthor().getUser().getId(), currentUser.getId()));
             } else {
                 hasAccess = enrollmentRepository.existsByUser_IdAndCourse_Id(currentUser.getId(), id);
             }

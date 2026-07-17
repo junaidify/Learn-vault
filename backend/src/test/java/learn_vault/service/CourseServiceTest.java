@@ -55,7 +55,9 @@ class CourseServiceTest {
     @BeforeEach
     void setUp() {
         authorUser = new UserEntity("John Doe", "johndoe1", "john@example.com", "hashed", Role.AUTHOR);
+        org.springframework.test.util.ReflectionTestUtils.setField(authorUser, "id", 1L);
         author = new AuthorEntity(authorUser);
+        org.springframework.test.util.ReflectionTestUtils.setField(author, "id", 1L);
 
         courseDto = new CourseDto();
         courseDto.setName("Spring Boot Basics");

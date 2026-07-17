@@ -17,11 +17,15 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 
 @Configuration
 public class AppConfig {
     private final CustomUserDetailsService customUserDetailsService;
+
+    @Value("${app.allowed-origins:http://localhost:5173,https://learn-vault-six.vercel.app,https://learn-vault-*.vercel.app}")
+    private List<String> allowedOrigins;
 
     public AppConfig(CustomUserDetailsService customUserDetailsService) {
         this.customUserDetailsService = customUserDetailsService;
@@ -65,7 +69,7 @@ public class AppConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("http://localhost:5173", "https://learn-vault-six.vercel.app", "https://learn-vault-*.vercel.app"));
+        config.setAllowedOriginPatterns(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
