@@ -44,7 +44,9 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `/oauth2/authorization/google?redirect_uri=${window.location.origin}${from}`;
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+    const baseUrl = apiBaseUrl.startsWith('http') ? apiBaseUrl : '';
+    window.location.href = `${baseUrl}/oauth2/authorization/google?redirect_uri=${window.location.origin}${from}`;
   };
 
   return (

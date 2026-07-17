@@ -27,6 +27,7 @@ jwt:
 app:
   oauth2-redirect: ${OAUTH2_REDIRECT_URL:http://localhost:5173/dashboard}
   cookie-secure: ${COOKIE_SECURE:false}
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173,https://learn-vault-six.vercel.app,https://learn-vault-*.vercel.app}
 
 razorpay:
   key:

@@ -38,6 +38,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.springframework.web.cors.CorsConfigurationSource;
+
 @WebMvcTest(CourseController.class)
 @Import({GlobalExceptionHandler.class, SecurityConfig.class, JwtFilters.class})
 class CourseControllerTest {
@@ -50,6 +52,15 @@ class CourseControllerTest {
     @MockBean CustomUserDetailsService customUserDetailsService;
     @MockBean AuthenticationProvider authenticationProvider;
     @MockBean Oauth2SuccessHandler oauth2SuccessHandler;
+    @MockBean learn_vault.repository.UserRepository userRepository;
+
+    @org.springframework.boot.test.context.TestConfiguration
+    static class TestConfig {
+        @org.springframework.context.annotation.Bean
+        public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+            return new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        }
+    }
 
     // ── Create Course (multipart) ────────────────────────────────────
 
@@ -114,7 +125,7 @@ class CourseControllerTest {
         CourseResponseDto dto = new CourseResponseDto(c1, false);
         Page<CourseResponseDto> page = new PageImpl<>(List.of(dto), PageRequest.of(0, 10), 1);
 
-        when(courseService.getCourses(any())).thenReturn(page);
+        when(courseService.getCourses(any(), any(), any())).thenReturn(page);
 
         mockMvc.perform(get("/api/v1/courses")
                         .param("page", "0")

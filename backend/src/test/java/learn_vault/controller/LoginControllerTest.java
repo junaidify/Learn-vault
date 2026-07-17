@@ -27,6 +27,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.springframework.web.cors.CorsConfigurationSource;
+
 @WebMvcTest(controllers = {LoginController.class, UserController.class})
 @Import({GlobalExceptionHandler.class, SecurityConfig.class, JwtFilters.class})
 class LoginControllerTest {
@@ -39,6 +41,15 @@ class LoginControllerTest {
     @MockBean CustomUserDetailsService customUserDetailsService;
     @MockBean AuthenticationProvider authenticationProvider;
     @MockBean Oauth2SuccessHandler oauth2SuccessHandler;
+    @MockBean learn_vault.repository.UserRepository userRepository;
+
+    @org.springframework.boot.test.context.TestConfiguration
+    static class TestConfig {
+        @org.springframework.context.annotation.Bean
+        public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+            return new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        }
+    }
 
     // ── Login ────────────────────────────────────────────────────────
 
