@@ -25,7 +25,7 @@ public class ChatService {
     }
 
     public String chat(Long courseId, UUID conversationId, String userMessage){
-        List<Double> questionVector = embeddingService.embed(userMessage);
+        List<Double> questionVector = embeddingService.embed(userMessage, "query");
         List<String> chunks = vectorSearchService.findRevelantChunks(courseId, questionVector);
 
         List<String> history = jdbcClient.sql("""

@@ -55,6 +55,10 @@ export default function CourseDetailPage() {
             );
           },
           () => setPaymentStatus('idle'), // dismissed
+          (error: any) => {
+            console.error('Payment failed:', error);
+            setPaymentStatus('error');
+          },
           user?.name,
         );
       },
