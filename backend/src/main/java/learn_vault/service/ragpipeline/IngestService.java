@@ -29,7 +29,7 @@ public class IngestService {
 
         String content = "Course: " + name + "\nDescription: " + description;
 
-        List<Double> embedding = embeddingService.embed(content);
+        List<Double> embedding = embeddingService.embed(content, "passage");
 
         String vectorString = embedding.toString();
 

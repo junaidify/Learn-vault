@@ -46,6 +46,7 @@ export function openRazorpayCheckout(
   orderData: CourseAmountResponseDto,
   onSuccess: (response: RazorpayResponse) => void,
   onDismiss?: () => void,
+  onError?: (error: any) => void,
   userName?: string,
 ): void {
   const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID as string | undefined;
@@ -74,5 +75,13 @@ export function openRazorpayCheckout(
   };
 
   const rzp = new window.Razorpay(options);
+
+  // By listening to payment.failed, Razorpay won't show the default native alert
+  rzp.on('payment.failed', function (response: any) {
+    if (onError) {
+      onError(response.error);
+    }
+  });
+
   rzp.open();
 }

@@ -20,11 +20,12 @@ public class EmbeddingService {
                 .build();
     }
 
-    public List<Double> embed(String text) {
+    public List<Double> embed(String text, String inputType) {
         Map<String, Object> request = Map.of(
                 "input", List.of(text),
                 "model", "nvidia/llama-nemotron-embed-1b-v2",
-                "dimensions", 768
+                "dimensions", 768,
+                "input_type", inputType
         );
 
         Map<String, Object> response = restClient.post()
