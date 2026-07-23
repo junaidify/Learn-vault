@@ -19,7 +19,6 @@ public class DataSourcePostProcessor implements BeanPostProcessor {
                  Statement statement = connection.createStatement()) {
                 statement.execute("CREATE EXTENSION IF NOT EXISTS vector");
             } catch (Exception e) {
-                // Log and gracefully handle if the database user doesn't have privileges or if the database is not PostgreSQL
                 System.err.println("[LearnVault] Warning: Failed to automatically create pgvector extension: " + e.getMessage());
             }
         }

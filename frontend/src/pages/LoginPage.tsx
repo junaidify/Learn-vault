@@ -5,6 +5,8 @@ import { loginSchema, type LoginFormValues, isEmail } from '../lib/validations';
 import { useLogin } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
+import api from '../lib/axios';
+import type { Role } from '../lib/types';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -22,7 +24,17 @@ export default function LoginPage() {
     defaultValues: { identifier: '', password: '' },
   });
 
-  const from = location.state?.from?.pathname || "/";
+  const getTargetPath = (): string => {
+    const fromState = location.state?.from;
+    if (!fromState) return '/';
+    if (typeof fromState === 'string') return fromState;
+    if (fromState.pathname) {
+      return `${fromState.pathname}${fromState.search || ''}${fromState.hash || ''}`;
+    }
+    return '/';
+  };
+
+  const targetPath = getTargetPath();
 
   const onSubmit = async (values: LoginFormValues) => {
     const payload = isEmail(values.identifier)
@@ -30,15 +42,18 @@ export default function LoginPage() {
       : { username: values.identifier, password: values.password };
 
     loginMutation.mutate(payload, {
-      onSuccess: () => {
-        /*
-         * ⚠️ FLAGGED GAP: The login endpoint returns only "Login successful" (plain text).
-         * It does NOT return name or role. We cannot populate AuthContext properly.
-         * Setting a placeholder — the user will have limited navigation until
-         * a GET /api/v1/auth/me endpoint is added.
-         */
-        setAuth(values.identifier, 'STUDENT');
-        navigate(from, {replace:true});
+      onSuccess: async () => {
+        try {
+          const res = await api.get<{ name: string; username: string; email: string; role: Role }>('/api/v1/auth/me');
+          if (res.data?.name && res.data?.role) {
+            setAuth(res.data.name, res.data.role);
+          } else {
+            setAuth(values.identifier, 'STUDENT');
+          }
+        } catch {
+          setAuth(values.identifier, 'STUDENT');
+        }
+        navigate(targetPath, { replace: true });
       },
     });
   };
@@ -47,7 +62,7 @@ export default function LoginPage() {
     // Dynamically resolve base URL to support both local proxy and Vercel production rewrites
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
     const baseUrl = apiBaseUrl.startsWith('http') ? apiBaseUrl : '';
-    window.location.href = `${baseUrl}/oauth2/authorization/google?redirect_uri=${window.location.origin}${from}`;
+    window.location.href = `${baseUrl}/oauth2/authorization/google?redirect_uri=${encodeURIComponent(window.location.origin + targetPath)}`;
   };
 
   return (

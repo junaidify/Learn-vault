@@ -25,10 +25,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Seeds the database with realistic fake data on startup.
- * Runs automatically — skips if data already exists.
- */
 @Component
 public class DataSeeder implements CommandLineRunner {
 

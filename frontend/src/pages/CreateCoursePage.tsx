@@ -47,8 +47,8 @@ export default function CreateCoursePage() {
       {
         data: {
           ...formValues,
-          author: user.name,
-          videoUrl: '', // Server sets this after S3 upload — see flagged gap
+          author: user.name || 'Author',
+          videoUrl: 'pending',
         },
         video: videoFile,
         onProgress: setUploadProgress,

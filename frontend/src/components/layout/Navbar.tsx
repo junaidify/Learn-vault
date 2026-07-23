@@ -218,8 +218,9 @@ export default function Navbar() {
               </button>
             ) : (
               <>
-                <MobileLink to="/login">Log in</MobileLink>
+                <MobileLink to="/login" state={{ from: location }}>Log in</MobileLink>
                 <Link to="/signup"
+                      state={{ from: location }}
                       className="mt-1 block rounded-lg px-3 py-2.5 text-center text-sm font-semibold text-white no-underline"
                       style={{ background: 'linear-gradient(135deg, var(--color-brand-600), var(--color-brand-500))' }}>
                   Sign up free
@@ -248,9 +249,10 @@ function NavLink({ to, children, active }: { to: string; children: React.ReactNo
   );
 }
 
-function MobileLink({ to, children }: { to: string; children: React.ReactNode }) {
+function MobileLink({ to, state, children }: { to: string; state?: any; children: React.ReactNode }) {
   return (
     <Link to={to}
+          state={state}
           className="rounded-lg px-3 py-2.5 text-sm font-medium no-underline transition-colors"
           style={{ color: 'var(--color-surface-800)' }}>
       {children}
