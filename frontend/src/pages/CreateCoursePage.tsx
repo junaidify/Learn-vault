@@ -210,7 +210,10 @@ export default function CreateCoursePage() {
               {createMutation.isError && (
                 <div className="rounded-lg p-3 text-sm font-medium"
                      style={{ background: '#FEF2F2', color: 'var(--color-error)' }}>
-                  Failed to create course. Please try again.
+                  {(createMutation.error as any)?.response?.data?.message ||
+                   (createMutation.error as any)?.response?.data ||
+                   (createMutation.error as Error)?.message ||
+                   'Failed to create course. Please try again.'}
                 </div>
               )}
 
