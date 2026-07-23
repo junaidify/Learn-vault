@@ -181,7 +181,7 @@ export default function CreateCoursePage() {
               <div className="space-y-3 rounded-xl p-4" style={{ background: 'var(--color-surface-50)' }}>
                 <ReviewRow label="Name" value={values.name} />
                 <ReviewRow label="Description" value={values.description} />
-                <ReviewRow label="Price" value={`₹${values.amount.toLocaleString('en-IN')}`} />
+                <ReviewRow label="Price" value={`₹${(Number(values.amount) || 0).toLocaleString('en-IN')}`} />
                 <ReviewRow label="Category" value={values.category} />
                 <ReviewRow label="Published" value={values.published ? 'Yes' : 'No'} />
                 <ReviewRow label="Video" value={videoFile?.name ?? '—'} />

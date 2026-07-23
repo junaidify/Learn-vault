@@ -209,26 +209,61 @@ export default function EditCoursePage() {
               <div className="space-y-3 rounded-xl p-4" style={{ background: 'var(--color-surface-50)' }}>
                 <ReviewRow label="Name" value={values.name} />
                 <ReviewRow label="Description" value={values.description} />
-                <ReviewRow label="Price" value={`₹${values.amount.toLocaleString('en-IN')}`} />
+                <ReviewRow label="Price" value={`₹${(Number(values.amount) || 0).toLocaleString('en-IN')}`} />
                 <ReviewRow label="Category" value={values.category} />
                 <ReviewRow label="Published" value={values.published ? 'Yes' : 'No'} />
                 <ReviewRow label="Video" value={videoFile ? `New: ${videoFile.name}` : 'No change'} />
               </div>
 
+              {/* Upload progress & Processing overlay/card */}
               {updateMutation.isPending && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs font-medium"
-                       style={{ color: 'var(--color-surface-800)' }}>
-                    <span>Uploading…</span>
-                    <span>{uploadProgress}%</span>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full"
-                       style={{ background: 'var(--color-surface-200)' }}>
-                    <div className="h-full rounded-full transition-all duration-300"
-                         style={{
-                           width: `${uploadProgress}%`,
-                           background: 'linear-gradient(90deg, var(--color-brand-600), var(--color-brand-400))',
-                         }} />
+                <div className="animate-fade-in rounded-2xl border p-5 shadow-sm transition-all"
+                     style={{ background: 'var(--color-surface-50)', borderColor: 'var(--color-brand-200)' }}>
+                  <div className="flex items-center gap-4">
+                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-black text-white shadow-md">
+                      {uploadProgress < 100 ? (
+                        <svg className="h-6 w-6 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 0115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                      ) : (
+                        <svg className="h-6 w-6 animate-spin text-indigo-400" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      )}
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between text-sm font-semibold" style={{ color: 'var(--color-surface-900)' }}>
+                        <span>
+                          {uploadProgress < 100
+                            ? 'Uploading video stream...'
+                            : 'Uploading to S3 Cloud & Updating Course...'}
+                        </span>
+                        <span className="font-bold text-indigo-600">{uploadProgress}%</span>
+                      </div>
+
+                      <p className="mt-1 text-xs" style={{ color: 'var(--color-surface-800)', opacity: 0.7 }}>
+                        {uploadProgress < 100
+                          ? 'Sending video file to the server. Please keep this browser window open.'
+                          : 'Processing video on AWS S3 storage and updating course details... Please wait.'}
+                      </p>
+
+                      {/* Animated Progress Bar */}
+                      <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--color-surface-200)' }}>
+                        <div
+                          className={`h-full rounded-full transition-all duration-300 ${
+                            uploadProgress === 100 ? 'animate-pulse' : ''
+                          }`}
+                          style={{
+                            width: `${uploadProgress}%`,
+                            background: uploadProgress < 100
+                              ? 'linear-gradient(90deg, var(--color-brand-600), var(--color-brand-400))'
+                              : 'linear-gradient(90deg, #6366F1, #8B5CF6, #EC4899)',
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -236,7 +271,10 @@ export default function EditCoursePage() {
               {updateMutation.isError && (
                 <div className="rounded-lg p-3 text-sm font-medium"
                      style={{ background: '#FEF2F2', color: 'var(--color-error)' }}>
-                  Failed to update course. Please try again.
+                  {(updateMutation.error as any)?.response?.data?.message ||
+                   (updateMutation.error as any)?.response?.data ||
+                   (updateMutation.error as Error)?.message ||
+                   'Failed to update course. Please try again.'}
                 </div>
               )}
 
@@ -248,9 +286,19 @@ export default function EditCoursePage() {
                   ← Back
                 </button>
                 <button type="submit" disabled={updateMutation.isPending}
-                        className="cursor-pointer rounded-xl border-none px-6 py-2.5 text-sm font-semibold text-white transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex items-center gap-2 cursor-pointer rounded-xl border-none px-6 py-2.5 text-sm font-semibold text-white transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
                         style={{ background: 'linear-gradient(135deg, var(--color-brand-600), var(--color-brand-500))' }}>
-                  {updateMutation.isPending ? 'Updating…' : 'Update Course'}
+                  {updateMutation.isPending ? (
+                    <>
+                      <svg className="h-4 w-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>{uploadProgress < 100 ? `Uploading (${uploadProgress}%)...` : 'Processing S3 Upload...'}</span>
+                    </>
+                  ) : (
+                    'Update Course'
+                  )}
                 </button>
               </div>
             </div>
