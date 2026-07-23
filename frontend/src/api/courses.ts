@@ -82,7 +82,6 @@ export function useCreateCourse() {
       formData.append('video', video);
 
       const res = await api.post('/api/v1/courses/create-course', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (e) => {
           if (e.total && onProgress) {
             onProgress(Math.round((e.loaded * 100) / e.total));
@@ -123,7 +122,6 @@ export function useUpdateCourse() {
       }
 
       const res = await api.patch(`/api/v1/courses/${id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (e) => {
           if (e.total && onProgress) {
             onProgress(Math.round((e.loaded * 100) / e.total));
