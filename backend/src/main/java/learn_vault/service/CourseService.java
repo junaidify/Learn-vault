@@ -55,6 +55,9 @@ public class CourseService {
         }
 
         AuthorEntity author = authorRepository.findByUserId(user.getId());
+        if (author == null) {
+            author = authorRepository.save(new AuthorEntity(user));
+        }
 
         if (courseRepository.existsByNameAndAuthor_Id(dto.getName(), author.getId())) {
             throw new DuplicateResourceException("Course already exists under this author");

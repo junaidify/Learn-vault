@@ -22,14 +22,24 @@ export default function SignupPage() {
     defaultValues: { name: '', username: '', email: '', password: '', role: 'STUDENT' },
   });
 
-const from = location.state?.from?.pathname || "/";
+  const getTargetPath = (): string => {
+    const fromState = location.state?.from;
+    if (!fromState) return '/';
+    if (typeof fromState === 'string') return fromState;
+    if (fromState.pathname) {
+      return `${fromState.pathname}${fromState.search || ''}${fromState.hash || ''}`;
+    }
+    return '/';
+  };
+
+  const targetPath = getTargetPath();
 
   const onSubmit = async (values: SignupFormValues) => {
     signupMutation.mutate(values, {
       onSuccess: () => {
         // After signup we know name + role from the form data
         setAuth(values.name, values.role);
-        navigate(from, {replace: true});
+        navigate(targetPath, { replace: true });
       },
     });
   };
@@ -37,7 +47,7 @@ const from = location.state?.from?.pathname || "/";
   const handleGoogleSignup = () => {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
     const baseUrl = apiBaseUrl.startsWith('http') ? apiBaseUrl : '';
-    window.location.href = `${baseUrl}/oauth2/authorization/google?redirect_uri=${window.location.origin}${from}`;
+    window.location.href = `${baseUrl}/oauth2/authorization/google?redirect_uri=${encodeURIComponent(window.location.origin + targetPath)}`;
   };
 
   return (

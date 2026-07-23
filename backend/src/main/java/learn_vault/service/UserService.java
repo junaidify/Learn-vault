@@ -35,7 +35,7 @@ public class UserService {
 
     @Transactional
     public String userSignUp(SignupDto dto) {
-        if (userRepository.existsByUsernameOrEmail(dto.getUsername(), dto.getEmail())) {
+        if(userRepository.existsByUsernameOrEmail(dto.getUsername(), dto.getEmail()) && userRepository.existsByRole(dto.getRole())) {
             throw new DuplicateResourceException("User already exists");
         }
 

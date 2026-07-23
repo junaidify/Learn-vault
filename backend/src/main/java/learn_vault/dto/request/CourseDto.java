@@ -24,7 +24,6 @@ public class CourseDto {
     @NotNull
     private boolean published;
 
-    @NotBlank(message = "upload course video")
     private String videoUrl;
 
     @NotBlank(message = "Please enter the author's name.")
