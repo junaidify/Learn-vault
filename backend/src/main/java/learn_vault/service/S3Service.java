@@ -54,15 +54,17 @@ public class S3Service {
     public Map<String, String> generatePresignedUploadUrl(String fileName, String contentType) {
         String key = "videos/" + UUID.randomUUID() + "_" + fileName;
 
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        PutObjectRequest.Builder requestBuilder = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(key)
-                .contentType(contentType)
-                .build();
+                .key(key);
+
+        if (contentType != null && !contentType.isBlank()) {
+            requestBuilder.contentType(contentType);
+        }
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(15))
-                .putObjectRequest(putObjectRequest)
+                .putObjectRequest(requestBuilder.build())
                 .build();
 
         String uploadUrl = s3Presigner.presignPutObject(presignRequest).url().toString();
