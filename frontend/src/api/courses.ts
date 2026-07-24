@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 import type {
@@ -60,7 +61,7 @@ export function useCourse(id: number | string) {
   });
 }
 
-/** POST /api/v1/courses/create-course — multipart/form-data */
+/** POST /api/v1/courses/create-course — via S3 presigned URL for fast direct upload */
 export function useCreateCourse() {
   const qc = useQueryClient();
 
@@ -69,24 +70,38 @@ export function useCreateCourse() {
       data,
       video,
       onProgress,
+      onStageChange,
     }: {
       data: CourseFormData;
       video: File;
       onProgress?: (pct: number) => void;
+      onStageChange?: (stage: string) => void;
     }) => {
-      const formData = new FormData();
-      formData.append(
-        'data',
-        new Blob([JSON.stringify(data)], { type: 'application/json' }),
-      );
-      formData.append('video', video);
+      // 1. Get presigned upload URL from Spring Boot backend
+      onStageChange?.('Authorizing secure S3 upload...');
+      const urlRes = await api.get<{ uploadUrl: string; key: string }>('/api/v1/courses/upload-url', {
+        params: { fileName: video.name, contentType: video.type || 'video/mp4' },
+      });
+      const { uploadUrl, key } = urlRes.data;
 
-      const res = await api.post('/api/v1/courses/create-course', formData, {
+      // 2. Stream video file directly to AWS S3 bucket
+      onStageChange?.('Uploading video directly to S3 cloud...');
+      await axios.put(uploadUrl, video, {
+        headers: {
+          'Content-Type': video.type || 'video/mp4',
+        },
         onUploadProgress: (e) => {
           if (e.total && onProgress) {
             onProgress(Math.round((e.loaded * 100) / e.total));
           }
         },
+      });
+
+      // 3. Finalize course creation in backend DB
+      onStageChange?.('Finalizing course creation & saving...');
+      const res = await api.post('/api/v1/courses/create-course-json', {
+        ...data,
+        videoUrl: key,
       });
       return res.data;
     },

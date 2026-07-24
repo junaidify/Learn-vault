@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/courses")
@@ -36,6 +38,13 @@ public class CourseController {
         this.s3Service = s3Service;
     }
 
+    @GetMapping("/upload-url")
+    @PreAuthorize("hasRole('AUTHOR')")
+    public ResponseEntity<Map<String, String>> getUploadUrl(@RequestParam("fileName") String fileName,
+                                                           @RequestParam(value = "contentType", defaultValue = "video/mp4") String contentType) {
+        return ResponseEntity.ok(s3Service.generatePresignedUploadUrl(fileName, contentType));
+    }
+
     @PostMapping(value = "/create-course", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('AUTHOR')")
     public ResponseEntity<?> courseCreate(@Valid @RequestPart("data") CourseDto dto,
@@ -44,6 +53,13 @@ public class CourseController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(courseService.courseCreate(dto, url));
+    }
+
+    @PostMapping(value = "/create-course-json", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AUTHOR')")
+    public ResponseEntity<?> courseCreateJson(@Valid @RequestBody CourseDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(courseService.courseCreate(dto, dto.getVideoUrl()));
     }
 
     @DeleteMapping("/{id}")

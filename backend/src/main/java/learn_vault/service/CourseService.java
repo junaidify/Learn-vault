@@ -168,4 +168,5 @@ public class CourseService {
                 .map(course -> new CourseResponseDto(course, true))
                 .toList();
     }
+
 }
