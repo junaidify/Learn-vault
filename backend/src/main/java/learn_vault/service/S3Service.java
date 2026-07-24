@@ -10,9 +10,12 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -46,6 +49,28 @@ public class S3Service {
         }
 
         return key;
+    }
+
+    public Map<String, String> generatePresignedUploadUrl(String fileName, String contentType) {
+        String key = "videos/" + UUID.randomUUID() + "_" + fileName;
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .contentType(contentType)
+                .build();
+
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(15))
+                .putObjectRequest(putObjectRequest)
+                .build();
+
+        String uploadUrl = s3Presigner.presignPutObject(presignRequest).url().toString();
+
+        Map<String, String> response = new HashMap<>();
+        response.put("uploadUrl", uploadUrl);
+        response.put("key", key);
+        return response;
     }
 
     public void deleteVideo(String key){

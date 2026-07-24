@@ -16,6 +16,7 @@ export default function CreateCoursePage() {
   const [step, setStep] = useState<Step>(1);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [currentStage, setCurrentStage] = useState('Preparing upload...');
 
   const {
     register,
@@ -52,6 +53,7 @@ export default function CreateCoursePage() {
         },
         video: videoFile,
         onProgress: setUploadProgress,
+        onStageChange: setCurrentStage,
       },
       {
         onSuccess: () => navigate('/author/courses'),
@@ -208,18 +210,14 @@ export default function CreateCoursePage() {
 
                     <div className="flex-1">
                       <div className="flex items-center justify-between text-sm font-semibold" style={{ color: 'var(--color-surface-900)' }}>
-                        <span>
-                          {uploadProgress < 100
-                            ? 'Uploading video stream...'
-                            : 'Uploading to S3 Cloud & Finalizing Course...'}
-                        </span>
+                        <span>{currentStage}</span>
                         <span className="font-bold text-indigo-600">{uploadProgress}%</span>
                       </div>
 
                       <p className="mt-1 text-xs" style={{ color: 'var(--color-surface-800)', opacity: 0.7 }}>
                         {uploadProgress < 100
-                          ? 'Sending video file to the server. Please keep this browser window open.'
-                          : 'Processing video on AWS S3 storage and saving course details... Please wait.'}
+                          ? 'Uploading video file directly to AWS S3 storage. Please keep this window open.'
+                          : 'Finalizing course details and saving to database...'}
                       </p>
 
                       {/* Animated Progress Bar */}
