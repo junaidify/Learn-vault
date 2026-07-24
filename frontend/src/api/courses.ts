@@ -86,16 +86,25 @@ export function useCreateCourse() {
 
       // 2. Stream video file directly to AWS S3 bucket
       onStageChange?.('Uploading video directly to S3 cloud...');
-      await axios.put(uploadUrl, video, {
-        headers: {
-          'Content-Type': video.type || 'video/mp4',
-        },
-        onUploadProgress: (e) => {
-          if (e.total && onProgress) {
-            onProgress(Math.round((e.loaded * 100) / e.total));
-          }
-        },
-      });
+      const fileContentType = video.type || 'video/mp4';
+      
+      try {
+        await axios.put(uploadUrl, video, {
+          headers: {
+            'Content-Type': fileContentType,
+          },
+          onUploadProgress: (e) => {
+            if (e.total && onProgress) {
+              onProgress(Math.round((e.loaded * 100) / e.total));
+            }
+          },
+        });
+      } catch (err: any) {
+        if (!err.response) {
+          throw new Error('S3 Direct Upload Network Error. Please check AWS S3 Bucket CORS configuration.');
+        }
+        throw err;
+      }
 
       // 3. Finalize course creation in backend DB
       onStageChange?.('Finalizing course creation & saving...');
