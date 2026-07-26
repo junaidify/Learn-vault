@@ -126,21 +126,15 @@ public class CourseService {
         CourseEntity course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course with ID " + id + " not found"));
 
-        boolean hasAccess = false;
-        if (course.getAmount() == 0) {
-            hasAccess = true;
-        } else if (currentUser != null) {
-            if (currentUser.getRole() == Role.ADMIN) {
-                hasAccess = true;
-            } else if (currentUser.getRole() == Role.AUTHOR) {
-                hasAccess = (course.getAuthor() != null && course.getAuthor().getUser() != null &&
-                             java.util.Objects.equals(course.getAuthor().getUser().getId(), currentUser.getId()));
-            } else {
-                hasAccess = enrollmentRepository.existsByUser_IdAndCourse_Id(currentUser.getId(), id);
-            }
-        }
+        boolean hasAccess = checkUserAccess(course, currentUser);
+        String preSignedUrl = null; 
 
-        return new CourseResponseDto(course, hasAccess);
+        
+       if(hasAccess && course.getVideoKey() != null && !course.getVideoKey().isBlank()){
+         preSignedUrl = s3Service.generatePresignedUrl((course.getVideoKey()));
+       }
+
+        return new CourseResponseDto(course, hasAccess, preSignedUrl);
     }
 
     @Transactional(readOnly = true)
@@ -150,8 +144,21 @@ public class CourseService {
         }
         return enrollmentRepository.findByUser_IdAndEnrollmentStatus(currentUser.getId(), EnrollmentStatus.ACTIVE)
                 .stream()
-                .map(enrollment -> new CourseResponseDto(enrollment.getCourse(), true))
+                .map(enrollment -> new CourseResponseDto(enrollment.getCourse(), true, checkUserAccess(enrollment.getCourse(), currentUser) ? s3Service.generatePresignedUrl(enrollment.getCourse().getVideoKey()) : null))
                 .toList();
+    }
+
+    private boolean checkUserAccess(CourseEntity course, UserEntity currentUser){
+       if(course.getAmount() == 0) return true; 
+       if(currentUser == null) return false; 
+       if(currentUser.getRole() == Role.ADMIN) return true; 
+
+       if(currentUser.getRole() == Role.AUTHOR){
+        return course.getAuthor() != null && course.getAuthor().getUser() != null 
+            && course.getAuthor().getUser().getId().equals(currentUser.getId());
+       }
+
+       return enrollmentRepository.existsByUser_IdAndCourse_Id(currentUser.getId(), course.getId());
     }
 
     @Transactional(readOnly = true)
@@ -165,7 +172,7 @@ public class CourseService {
         }
         return courseRepository.findByAuthor_Id(author.getId())
                 .stream()
-                .map(course -> new CourseResponseDto(course, true))
+                .map(course -> new CourseResponseDto(course, true, checkUserAccess(course, currentUser) ? s3Service.generatePresignedUrl(course.getVideoKey()) : null))
                 .toList();
     }
 
