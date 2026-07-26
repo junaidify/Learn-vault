@@ -20,7 +20,7 @@ public class CourseResponseDto {
     private final LocalDateTime updatedAt;
     private final String videoUrl;
 
-    public CourseResponseDto(CourseEntity course, boolean hasAccess) {
+    public CourseResponseDto(CourseEntity course, boolean hasAccess, String videoUrl) {
         this.id = course.getId();
         this.name = course.getName();
         this.description = course.getDescription();
@@ -30,7 +30,10 @@ public class CourseResponseDto {
         this.published = course.getPublished();
         this.createdAt = course.getCreatedAt();
         this.updatedAt = course.getUpdatedAt();
-        this.videoUrl = hasAccess ? course.getVideoKey() : null;
+        this.videoUrl = hasAccess ? videoUrl : null;
     }
 
+    public CourseResponseDto(CourseEntity course, boolean hasAccess){
+        this(course, hasAccess, null);
+    }
 }
