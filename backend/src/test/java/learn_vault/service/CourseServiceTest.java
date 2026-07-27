@@ -43,6 +43,7 @@ class CourseServiceTest {
     @Mock CourseRepository courseRepository;
     @Mock AuthorRepository authorRepository;
     @Mock UserRepository userRepository;
+    @Mock learn_vault.repository.EnrollmentRepository enrollmentRepository;
     @Mock CourseMapper courseMapper;
     @Mock S3Service s3Service;
 
@@ -230,5 +231,29 @@ class CourseServiceTest {
         assertThatThrownBy(() -> courseService.getCourse(99L, authorUser))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("not found");
+    }
+
+    // ── getEnrolledCourses ───────────────────────────────────────────
+
+    @Test
+    void getEnrolledCourses_shouldReturnEnrolledCourses_whenVideoKeyIsNull() {
+        UserEntity student = new UserEntity("Jane", "jane1", "jane@example.com", "pass", Role.STUDENT);
+        org.springframework.test.util.ReflectionTestUtils.setField(student, "id", 2L);
+
+        CourseEntity course = new CourseEntity("Free Java", "Java desc", 0L, Category.TECH, true, author, null);
+        org.springframework.test.util.ReflectionTestUtils.setField(course, "id", 10L);
+
+        learn_vault.entity.enrollment.EnrollmentEntity enrollment = new learn_vault.entity.enrollment.EnrollmentEntity(
+                course, student, learn_vault.enums.EnrollmentStatus.ACTIVE, java.time.LocalDateTime.now()
+        );
+
+        when(enrollmentRepository.findByUser_IdAndEnrollmentStatus(2L, learn_vault.enums.EnrollmentStatus.ACTIVE))
+                .thenReturn(List.of(enrollment));
+
+        List<CourseResponseDto> enrolled = courseService.getEnrolledCourses(student);
+
+        assertThat(enrolled).hasSize(1);
+        assertThat(enrolled.get(0).getName()).isEqualTo("Free Java");
+        assertThat(enrolled.get(0).getVideoUrl()).isNull();
     }
 }
