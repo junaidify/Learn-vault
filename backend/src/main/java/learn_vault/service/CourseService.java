@@ -140,7 +140,7 @@ public class CourseService {
     @Transactional(readOnly = true)
     public List<CourseResponseDto> getEnrolledCourses(UserEntity currentUser) {
         if (currentUser == null) {
-            throw new ResourceNotFoundException("User not authenticated");
+            return List.of();
         }
         return enrollmentRepository.findByUser_IdAndEnrollmentStatus(currentUser.getId(), EnrollmentStatus.ACTIVE)
                 .stream()
