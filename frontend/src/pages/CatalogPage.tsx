@@ -123,7 +123,7 @@ export default function CatalogPage() {
 
           {/* Subtitle */}
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
-            Tutorly is designed for creators, educators, trainers, and academies who want to launch a powerful online learning platform.
+            LearnVault is designed for creators, educators, trainers, and academies who want to launch a powerful online learning platform.
           </p>
 
           {/* Search bar (pill shape) */}
@@ -252,19 +252,19 @@ export default function CatalogPage() {
             {/* Left side text and stats */}
             <div>
               <span className="text-sm font-bold uppercase tracking-wider text-slate-500">
-                About Tutorly
+                About LearnVault
               </span>
               <h2
                 className="mt-3 text-3xl font-extrabold text-black sm:text-4xl leading-tight"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
-                Tutorly helps creators deliver this through a professional, structured, and conversion-optimized platform. Learners want practical skills, and flexible learning.
+                LearnVault helps creators deliver this through a professional, structured, and conversion-optimized platform. Learners want practical skills, and flexible learning.
               </h2>
               
               {/* Contact Us Pill Button */}
               <div className="mt-8">
                 <a
-                  href="mailto:contact@tutorly.com"
+                  href="mailto:contact@learnvault.com"
                   className="inline-flex items-center gap-3 rounded-full bg-black py-3 pl-6 pr-3 text-sm font-semibold text-white no-underline shadow-md transition-all hover:bg-slate-900"
                 >
                   <span>CONTACT US</span>
@@ -282,7 +282,7 @@ export default function CatalogPage() {
                 </div>
                 <div>
                   <span className="block text-2xl sm:text-3xl font-black text-black">25000+</span>
-                  <span className="mt-1 block text-xs sm:text-sm text-slate-500 leading-snug">students enrolled our tutorly courses</span>
+                  <span className="mt-1 block text-xs sm:text-sm text-slate-500 leading-snug">students enrolled in our learn-vault courses</span>
                 </div>
                 <div>
                   <span className="block text-2xl sm:text-3xl font-black text-black">100%</span>
@@ -297,7 +297,7 @@ export default function CatalogPage() {
               <div className="absolute -inset-4 rounded-3xl bg-slate-200 transform rotate-1 opacity-50" />
               <img
                 src="/images/about_instructor.jpg"
-                alt="Tutorly Professional Learning"
+                alt="LearnVault Professional Learning"
                 className="relative w-full rounded-2xl shadow-xl object-cover"
                 style={{ maxHeight: '420px' }}
               />

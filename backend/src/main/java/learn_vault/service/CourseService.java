@@ -127,12 +127,7 @@ public class CourseService {
                 .orElseThrow(() -> new ResourceNotFoundException("Course with ID " + id + " not found"));
 
         boolean hasAccess = checkUserAccess(course, currentUser);
-        String preSignedUrl = null; 
-
-        
-       if(hasAccess && course.getVideoKey() != null && !course.getVideoKey().isBlank()){
-         preSignedUrl = s3Service.generatePresignedUrl((course.getVideoKey()));
-       }
+        String preSignedUrl = getPresignedUrlIfHasAccess(course, currentUser);
 
         return new CourseResponseDto(course, hasAccess, preSignedUrl);
     }
@@ -144,7 +139,7 @@ public class CourseService {
         }
         return enrollmentRepository.findByUser_IdAndEnrollmentStatus(currentUser.getId(), EnrollmentStatus.ACTIVE)
                 .stream()
-                .map(enrollment -> new CourseResponseDto(enrollment.getCourse(), true, checkUserAccess(enrollment.getCourse(), currentUser) ? s3Service.generatePresignedUrl(enrollment.getCourse().getVideoKey()) : null))
+                .map(enrollment -> new CourseResponseDto(enrollment.getCourse(), true, getPresignedUrlIfHasAccess(enrollment.getCourse(), currentUser)))
                 .toList();
     }
 
@@ -161,6 +156,24 @@ public class CourseService {
        return enrollmentRepository.existsByUser_IdAndCourse_Id(currentUser.getId(), course.getId());
     }
 
+    private String getPresignedUrlIfHasAccess(CourseEntity course, UserEntity currentUser) {
+        if (course == null || !checkUserAccess(course, currentUser)) {
+            return null;
+        }
+        String key = course.getVideoKey();
+        if (key == null || key.isBlank()) {
+            return null;
+        }
+        if (key.startsWith("http://") || key.startsWith("https://")) {
+            return key;
+        }
+        try {
+            return s3Service.generatePresignedUrl(key);
+        } catch (Exception e) {
+            return key;
+        }
+    }
+
     @Transactional(readOnly = true)
     public List<CourseResponseDto> getAuthorCourses(UserEntity currentUser) {
         if (currentUser == null) {
@@ -172,7 +185,7 @@ public class CourseService {
         }
         return courseRepository.findByAuthor_Id(author.getId())
                 .stream()
-                .map(course -> new CourseResponseDto(course, true, checkUserAccess(course, currentUser) ? s3Service.generatePresignedUrl(course.getVideoKey()) : null))
+                .map(course -> new CourseResponseDto(course, true, getPresignedUrlIfHasAccess(course, currentUser)))
                 .toList();
     }
 

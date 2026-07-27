@@ -46,13 +46,14 @@ export default function Navbar() {
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 no-underline">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-black">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
           </div>
           <span className="text-xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-heading)', color: '#000000' }}>
-            tutorly<span className="text-gray-400">.</span>
+            learn-vault<span className="text-gray-400">.</span>
           </span>
         </Link>
 
