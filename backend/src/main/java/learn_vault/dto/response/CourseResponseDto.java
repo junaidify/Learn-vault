@@ -19,6 +19,7 @@ public class CourseResponseDto {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
     private final String videoUrl;
+    private final boolean enrolled;
 
     public CourseResponseDto(CourseEntity course, boolean hasAccess, String videoUrl) {
         this.id = course.getId();
@@ -31,6 +32,7 @@ public class CourseResponseDto {
         this.createdAt = course.getCreatedAt();
         this.updatedAt = course.getUpdatedAt();
         this.videoUrl = hasAccess ? videoUrl : null;
+        this.enrolled = hasAccess;
     }
 
     public CourseResponseDto(CourseEntity course, boolean hasAccess){

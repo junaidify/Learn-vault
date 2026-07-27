@@ -62,20 +62,6 @@ public class CourseController {
                 .body(courseService.courseCreate(dto, dto.getVideoUrl()));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCourse(@PathVariable Long id){
-        courseService.deleteCourse(id);
-        return ResponseEntity.ok("Course deleted successfully.");
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<String> updateCourse(@PathVariable Long id, @Valid @RequestPart("data") CourseDto dto,
-                                               @RequestPart(value = "video", required = false) MultipartFile video){
-        courseService.updateCourse(id, dto, video);
-        return ResponseEntity.ok("Course updated successfully.");
-    }
-
-
     @GetMapping
     public ResponseEntity<Page<CourseResponseDto>> getCourses(@RequestParam(defaultValue = "0") @Min(0) int page,
                                                               @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
@@ -103,11 +89,6 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCourses(category, searchParam, pageable));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CourseResponseDto> getCourse(@PathVariable Long id, @AuthenticationPrincipal UserEntity currentUser) {
-        return ResponseEntity.ok(courseService.getCourse(id, currentUser));
-    }
-
     @GetMapping("/enrolled")
     public ResponseEntity<List<CourseResponseDto>> getEnrolledCourses(@AuthenticationPrincipal UserEntity currentUser) {
         return ResponseEntity.ok(courseService.getEnrolledCourses(currentUser));
@@ -119,4 +100,22 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getAuthorCourses(currentUser));
     }
 
+    @GetMapping("/{id:\\d+}")
+    public ResponseEntity<CourseResponseDto> getCourse(@PathVariable Long id, @AuthenticationPrincipal UserEntity currentUser) {
+        return ResponseEntity.ok(courseService.getCourse(id, currentUser));
+    }
+
+    @DeleteMapping("/{id:\\d+}")
+    public ResponseEntity<String> deleteCourse(@PathVariable Long id){
+        courseService.deleteCourse(id);
+        return ResponseEntity.ok("Course deleted successfully.");
+    }
+
+    @PatchMapping("/{id:\\d+}")
+    public ResponseEntity<String> updateCourse(@PathVariable Long id, @Valid @RequestPart("data") CourseDto dto,
+                                               @RequestPart(value = "video", required = false) MultipartFile video){
+        courseService.updateCourse(id, dto, video);
+        return ResponseEntity.ok("Course updated successfully.");
+    }
 }
+
