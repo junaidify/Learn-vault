@@ -42,6 +42,7 @@ export interface CourseResponseDto {
   createdAt: string;
   updatedAt: string;
   videoUrl: string | null;
+  enrolled?: boolean;
 }
 
 /** Mirrors Spring Page<T> response shape */

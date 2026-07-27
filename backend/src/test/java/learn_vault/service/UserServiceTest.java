@@ -65,6 +65,7 @@ class UserServiceTest {
     @Test
     void signup_shouldThrow_whenUserAlreadyExists() {
         when(userRepository.existsByUsernameOrEmail(anyString(), anyString())).thenReturn(true);
+        when(userRepository.existsByRole(any())).thenReturn(true);
 
         assertThatThrownBy(() -> userService.userSignUp(signupDto))
                 .isInstanceOf(DuplicateResourceException.class)

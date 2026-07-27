@@ -66,7 +66,7 @@ export default function CourseDetailPage() {
     });
   };
 
-  const hasAccess = paymentStatus === 'success' || !!course?.videoUrl;
+  const hasAccess = paymentStatus === 'success' || !!course?.enrolled || !!course?.videoUrl;
 
   // Loading
   if (isLoading) {
