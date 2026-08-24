@@ -24,10 +24,12 @@ public class S3Config{
   // this bean validate the user and allow to perform s3 operations(upload, download, delete, read)
   @Bean
   public S3Client s3Client(){
-    AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+    String effectiveAccessKey = (accessKey == null || accessKey.isBlank()) ? "dummyAccessKey" : accessKey;
+    String effectiveSecretKey = (secretKey == null || secretKey.isBlank()) ? "dummySecretKey" : secretKey;
+    AwsBasicCredentials credentials = AwsBasicCredentials.create(effectiveAccessKey, effectiveSecretKey);
 
     return S3Client.builder()
-            .region(Region.of(region))
+            .region(Region.of(region != null && !region.isBlank() ? region : "ap-south-1"))
             .credentialsProvider(StaticCredentialsProvider.create(credentials))
             .build();
   }
@@ -35,10 +37,12 @@ public class S3Config{
   // it validates user and generate temp url to watch the video for security reasons.
   @Bean
   public S3Presigner s3Presigner(){
-    AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+    String effectiveAccessKey = (accessKey == null || accessKey.isBlank()) ? "dummyAccessKey" : accessKey;
+    String effectiveSecretKey = (secretKey == null || secretKey.isBlank()) ? "dummySecretKey" : secretKey;
+    AwsBasicCredentials credentials = AwsBasicCredentials.create(effectiveAccessKey, effectiveSecretKey);
 
     return S3Presigner.builder()
-            .region(Region.of(region))
+            .region(Region.of(region != null && !region.isBlank() ? region : "ap-south-1"))
             .credentialsProvider(StaticCredentialsProvider.create(credentials))
             .build();
   }
