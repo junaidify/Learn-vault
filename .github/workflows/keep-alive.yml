@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping backend
-        run: curl -f https://your-actual-backend-url.onrender.com/health || exit 1
+        run: curl -f https://learn-vault-1.onrender.com/health || exit 1
